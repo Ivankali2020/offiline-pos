@@ -1,0 +1,26 @@
+abstract class AppRoutes {
+  static const dashboard = '/';
+  static const productList = '/products';
+  static const productForm = '/products/add';
+  static const productDetail = '/products/detail';
+  static const saleDetails = '/sale-details';
+  static const cart = '/cart';
+  static const productPicker = '/product-picker';
+  static const checkout = '/checkout';
+  static const orders = '/orders';
+  static const purchases = '/purchases';
+  static const purchaseCreate = '/purchases/create';
+  static const purchaseProductPicker = '/purchases/product-picker';
+  static const suppliers = '/suppliers';
+  static const payments = '/payments';
+  static const backup = '/backup';
+  static const settings = '/settings';
+  static const brands = '/brands';
+  static const categories = '/categories';
+  static const attributes = '/attributes';
+  static const attributeForm = '/attributes/form';
+  static const expenses = '/expenses';
+  static const expenseCharts = '/expenses/charts';
+  static const expenseCategories = '/expense-categories';
+  static const csvImport = '/csv-import';
+}
