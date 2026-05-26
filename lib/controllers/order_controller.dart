@@ -4,6 +4,7 @@ import 'package:abpos/models/order.dart';
 import 'package:abpos/models/order_product.dart';
 
 import 'package:abpos/controllers/dashboard_controller.dart';
+import 'package:abpos/controllers/product_controller.dart';
 
 enum OrderDateFilterPreset { today, thisWeek, thisMonth, custom }
 
@@ -162,6 +163,10 @@ class OrderController extends GetxController {
       final dashboard = Get.find<DashboardController>();
       dashboard.loadMetrics();
       dashboard.loadChartData();
+    }
+
+    if (Get.isRegistered<ProductController>()) {
+      Get.find<ProductController>().loadProducts();
     }
 
     return Order(

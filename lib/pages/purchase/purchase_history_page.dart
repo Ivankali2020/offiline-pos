@@ -32,10 +32,10 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
     final controller = Get.find<PurchaseController>();
 
     return AppScaffold(
-      title: 'Purchases',
+      title: 'purchases'.tr,
       appBar: CustomAppBar(
-        title: 'Purchases',
-        subtitle: 'Track stock intake and open receipt-style purchase records.',
+        title: 'purchases'.tr,
+        subtitle: 'purchases_subtitle'.tr,
         titleWidget: _showSearch
             ? _SearchField(
                 controller: _searchController,
@@ -119,7 +119,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.toNamed(AppRoutes.purchaseCreate),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('New Purchase'),
+        label: Text('new_purchase'.tr),
       ),
     );
   }
@@ -145,7 +145,7 @@ class _SearchField extends StatelessWidget {
         style: const TextStyle(color: Colors.black),
         cursorColor: Colors.black,
         decoration: InputDecoration(
-          hintText: 'Search purchases',
+          hintText: 'search_purchases'.tr,
           hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.6)),
           filled: true,
           fillColor: Colors.white,
@@ -208,7 +208,7 @@ class _PurchaseOverview extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Purchase History',
+            'purchase_history'.tr,
             style: theme.textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w800,
@@ -216,7 +216,10 @@ class _PurchaseOverview extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Showing $visibleCount of $totalCount purchase receipts',
+            'showing_purchases_count'.trParams({
+              'visible': visibleCount.toString(),
+              'total': totalCount.toString(),
+            }),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.84),
             ),
@@ -226,14 +229,14 @@ class _PurchaseOverview extends StatelessWidget {
             children: [
               Expanded(
                 child: _OverviewTile(
-                  label: 'Purchases',
+                  label: 'purchases'.tr,
                   value: '$visibleCount',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _OverviewTile(
-                  label: 'Stock Value',
+                  label: 'stock_value'.tr,
                   value: 'MMK ${currencyFormat.format(totalAmount)}',
                 ),
               ),
@@ -376,7 +379,7 @@ class _PurchaseCard extends StatelessWidget {
                     _MetaPill(
                       icon: Icons.payments_outlined,
                       label:
-                          'Paid ${currencyFormat.format(purchase.paidAmount)}',
+                          'paid'.tr + ' ${currencyFormat.format(purchase.paidAmount)}',
                     ),
                     _MetaPill(
                       icon: Icons.schedule_rounded,
@@ -401,7 +404,7 @@ class _PurchaseCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Total Purchase',
+                              'total_purchase'.tr,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.textTheme.bodyMedium?.color
                                     ?.withValues(alpha: 0.70),
@@ -427,11 +430,11 @@ class _PurchaseCard extends StatelessWidget {
                           color: const Color(0xFF0F766E),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Receipt',
+                              'receipt'.tr,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -561,14 +564,14 @@ class _EmptySearchResult extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No matching purchases',
+              'no_matching_purchases'.tr,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Try another invoice number or clear the search.',
+              'try_another_invoice_or_clear'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey.shade600,
@@ -577,7 +580,7 @@ class _EmptySearchResult extends StatelessWidget {
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: onClear,
-              child: const Text('Clear Search'),
+              child: Text('clear_search'.tr),
             ),
           ],
         ),
@@ -612,14 +615,14 @@ class _EmptyPurchaseHistory extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              'No purchases yet',
+              'no_purchases_yet'.tr,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Saved purchase receipts and stock intake records will appear here.',
+              'no_purchases_subtitle'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.textTheme.bodyLarge?.color?.withValues(

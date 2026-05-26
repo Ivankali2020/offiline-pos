@@ -24,11 +24,11 @@ class _BackupPageState extends State<BackupPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Backup & Restore',
+      title: 'backup_restore'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
-      appBar: const CustomAppBar(
-        title: 'Backup & Restore',
-        subtitle: 'Export your SQLite data, restore from backup, or reset the app.',
+      appBar: CustomAppBar(
+        title: 'backup_restore'.tr,
+        subtitle: 'backup_restore_subtitle'.tr,
       ),
       body: Obx(
         () => Stack(
@@ -43,39 +43,39 @@ class _BackupPageState extends State<BackupPage> {
                   _ActionCard(
                     icon: LucideIcons.download,
                     color: const Color(0xFF2563EB),
-                    title: 'Export Backup',
-                    subtitle: 'Copy the full SQLite database into a backup file and share it.',
-                    actionLabel: 'Export',
+                    title: 'export_backup'.tr,
+                    subtitle: 'export_backup_subtitle'.tr,
+                    actionLabel: 'export_caps'.tr,
                     onPressed: controller.isBusy.value ? null : _exportBackup,
                   ),
                   const SizedBox(height: 12),
                   _ActionCard(
                     icon: LucideIcons.upload,
                     color: const Color(0xFF0F766E),
-                    title: 'Import Backup',
-                    subtitle: 'Pick a backup database file and replace local data.',
-                    actionLabel: 'Import',
+                    title: 'import_backup'.tr,
+                    subtitle: 'import_backup_subtitle'.tr,
+                    actionLabel: 'import_caps'.tr,
                     onPressed: controller.isBusy.value ? null : _importBackup,
                   ),
                   const SizedBox(height: 12),
                   _ActionCard(
                     icon: LucideIcons.trash2,
                     color: const Color(0xFFDC2626),
-                    title: 'Reset All Data',
-                    subtitle: 'Delete local data and recreate only required defaults.',
-                    actionLabel: 'Reset',
+                    title: 'reset_all_data'.tr,
+                    subtitle: 'reset_all_data_subtitle'.tr,
+                    actionLabel: 'reset_caps'.tr,
                     isDanger: true,
                     onPressed: controller.isBusy.value ? null : _resetAllData,
                   ),
                   const SizedBox(height: 20),
                   _SectionHeader(
-                    title: 'Export History',
-                    subtitle: 'Recent database backup files created on this device.',
+                    title: 'export_history'.tr,
+                    subtitle: 'export_history_subtitle'.tr,
                   ),
                   const SizedBox(height: 10),
                   if (controller.exports.isEmpty)
-                    const _EmptyHistoryCard(
-                      message: 'No backup exports yet.',
+                    _EmptyHistoryCard(
+                      message: 'no_backup_exports_yet'.tr,
                     )
                   else
                     ...controller.exports.asMap().entries.map((entry) {
@@ -92,13 +92,13 @@ class _BackupPageState extends State<BackupPage> {
                     }),
                   const SizedBox(height: 20),
                   _SectionHeader(
-                    title: 'Import History',
-                    subtitle: 'Recent restore operations and future CSV-ready import logs.',
+                    title: 'import_history'.tr,
+                    subtitle: 'import_history_subtitle'.tr,
                   ),
                   const SizedBox(height: 10),
                   if (controller.imports.isEmpty)
-                    const _EmptyHistoryCard(
-                      message: 'No import history yet.',
+                    _EmptyHistoryCard(
+                      message: 'no_import_history_yet'.tr,
                     )
                   else
                     ...controller.imports.asMap().entries.map((entry) {
@@ -146,13 +146,13 @@ class _BackupPageState extends State<BackupPage> {
         ),
       );
       Get.snackbar(
-        'Backup exported',
-        'Backup file created successfully.',
+        'backup_exported'.tr,
+        'backup_file_created_success'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (error) {
       Get.snackbar(
-        'Export failed',
+        'export_failed'.tr,
         error.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -162,18 +162,18 @@ class _BackupPageState extends State<BackupPage> {
   Future<void> _importBackup() async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Import backup?'),
-        content: const Text(
-          'This will replace all current local data with the selected backup file.',
+        title: Text('import_backup_confirm'.tr),
+        content: Text(
+          'import_backup_warning'.tr,
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Import'),
+            child: Text('import_caps'.tr),
           ),
         ],
       ),
@@ -191,13 +191,13 @@ class _BackupPageState extends State<BackupPage> {
     try {
       await controller.importBackup(selectedPath);
       Get.snackbar(
-        'Backup imported',
-        'Local data was restored successfully.',
+        'backup_imported'.tr,
+        'local_data_restored_success'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (error) {
       Get.snackbar(
-        'Import failed',
+        'import_failed'.tr,
         error.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -207,14 +207,14 @@ class _BackupPageState extends State<BackupPage> {
   Future<void> _resetAllData() async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Reset all data?'),
-        content: const Text(
-          'This deletes local data and recreates a fresh empty app with defaults only.',
+        title: Text('reset_all_data_confirm'.tr),
+        content: Text(
+          'reset_all_data_warning'.tr,
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () => Get.back(result: true),
@@ -222,7 +222,7 @@ class _BackupPageState extends State<BackupPage> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Reset'),
+            child: Text('reset_caps'.tr),
           ),
         ],
       ),
@@ -233,13 +233,13 @@ class _BackupPageState extends State<BackupPage> {
     try {
       await controller.resetAllData();
       Get.snackbar(
-        'Reset complete',
-        'App data was reset to defaults successfully.',
+        'reset_complete'.tr,
+        'app_data_reset_success'.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (error) {
       Get.snackbar(
-        'Reset failed',
+        'reset_failed'.tr,
         error.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -276,7 +276,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'Protect your store data',
+            'protect_store_data'.tr,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w900,
@@ -284,7 +284,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Export the full database for backup, restore another device from a backup file, or reset local data safely.',
+            'protect_store_data_subtitle'.tr,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.82),
               height: 1.35,
@@ -443,7 +443,7 @@ class _ExportHistoryTile extends StatelessWidget {
     return _HistoryTile(
       icon: LucideIcons.download,
       color: const Color(0xFF2563EB),
-      title: item.fileName ?? 'Backup export',
+      title: item.fileName ?? 'backup_export'.tr,
       subtitle:
           '${item.exporter} • ${_formatDate(item.completedAt ?? item.createdAt)}',
       details: item.fileDisk,

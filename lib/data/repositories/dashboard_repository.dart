@@ -34,7 +34,7 @@ class DashboardRepository {
   Future<double> totalProfit() async {
     final db = await DBProvider.instance.database;
     final result = await db.rawQuery(
-      'SELECT IFNULL(SUM(profit * quantity), 0) AS total FROM order_products',
+      'SELECT IFNULL(SUM(profit), 0) AS total FROM order_products',
     );
     if (result.isEmpty || result.first['total'] == null) {
       return 0.0;

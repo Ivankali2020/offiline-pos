@@ -15,14 +15,14 @@ class DashboardChartFilterBottomSheet extends StatefulWidget {
   ) {
     return AppBottomSheet.show<void>(
       context,
-      title: 'Filter Order Chart',
-      subtitle: 'Apply quick presets or a custom range to the trend line.',
+      title: 'filter_order_chart'.tr,
+      subtitle: 'filter_order_chart_subtitle'.tr,
       trailing: TextButton(
         onPressed: () async {
           await controller.clearChartFilter();
           Get.back<void>();
         },
-        child: const Text('Reset'),
+        child: Text('reset'.tr),
       ),
       child: DashboardChartFilterBottomSheet(controller: controller),
     );
@@ -57,7 +57,7 @@ class _DashboardChartFilterBottomSheetState
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Quick Date Filters',
+          'quick_date_filters'.tr,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -67,9 +67,9 @@ class _DashboardChartFilterBottomSheetState
           spacing: 10,
           runSpacing: 10,
           children: [
-            _buildPresetChip(DashboardDateFilterPreset.today, 'Today'),
-            _buildPresetChip(DashboardDateFilterPreset.thisWeek, 'This Week'),
-            _buildPresetChip(DashboardDateFilterPreset.thisMonth, 'This Month'),
+            _buildPresetChip(DashboardDateFilterPreset.today, 'today'.tr),
+            _buildPresetChip(DashboardDateFilterPreset.thisWeek, 'this_week'.tr),
+            _buildPresetChip(DashboardDateFilterPreset.thisMonth, 'this_month'.tr),
           ],
         ),
         const SizedBox(height: 24),
@@ -77,7 +77,7 @@ class _DashboardChartFilterBottomSheetState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Custom Date Range',
+              'custom_date_range'.tr,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -92,7 +92,7 @@ class _DashboardChartFilterBottomSheetState
                   });
                 },
                 icon: const Icon(Icons.clear_rounded, size: 18),
-                label: const Text('Clear dates'),
+                label: Text('clear_dates'.tr),
               ),
           ],
         ),
@@ -101,7 +101,7 @@ class _DashboardChartFilterBottomSheetState
           children: [
             Expanded(
               child: _DateButton(
-                label: 'Start Date',
+                label: 'start_date'.tr,
                 value: _formatDate(_startDate),
                 icon: Icons.event_available_rounded,
                 onTap: () => _pickDate(isStart: true),
@@ -110,7 +110,7 @@ class _DashboardChartFilterBottomSheetState
             const SizedBox(width: 12),
             Expanded(
               child: _DateButton(
-                label: 'End Date',
+                label: 'end_date'.tr,
                 value: _formatDate(_endDate),
                 icon: Icons.event_note_rounded,
                 onTap: () => _pickDate(isStart: false),
@@ -130,7 +130,7 @@ class _DashboardChartFilterBottomSheetState
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text('Cancel'),
+                child: Text('cancel'.tr),
               ),
             ),
             const SizedBox(width: 12),
@@ -138,7 +138,7 @@ class _DashboardChartFilterBottomSheetState
               child: ElevatedButton.icon(
                 onPressed: _apply,
                 icon: const Icon(Icons.check_circle_outline_rounded),
-                label: const Text('Apply Filters'),
+                label: Text('apply_filters'.tr),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   shape: RoundedRectangleBorder(
@@ -243,7 +243,7 @@ class _DashboardChartFilterBottomSheetState
 
   String _formatDate(DateTime? value) {
     if (value == null) {
-      return 'Select date';
+      return 'select_date'.tr;
     }
     return _dateFormat.format(value);
   }

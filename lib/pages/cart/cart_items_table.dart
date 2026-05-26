@@ -108,7 +108,7 @@ class CartItemsTable extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.productName ?? 'Product',
+                              item.productName ?? 'product_singular'.tr,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                               ),

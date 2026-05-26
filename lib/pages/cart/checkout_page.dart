@@ -96,7 +96,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       backgroundColor: pageBackground,
       appBar: CustomAppBar(
         title: 'checkout'.tr,
-        subtitle: 'Pick payment, collect amount, and attach proof if needed.',
+        subtitle: 'checkout_subtitle'.tr,
         actions: [
           IconButton(
             onPressed: () => Get.toNamed(AppRoutes.payments),
@@ -136,7 +136,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 16),
               _CheckoutSectionCard(
-                title: 'Order Summary',
+                title: 'order_summary'.tr,
                 icon: Icons.receipt_long_rounded,
                 child: Column(
                   children: [
@@ -170,7 +170,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 16),
               _CheckoutSectionCard(
-                title: 'Payment Setup',
+                title: 'payment_setup'.tr,
                 icon: Icons.account_balance_wallet_outlined,
                 child: Column(
                   children: [
@@ -215,7 +215,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 (value ?? '').trim(),
                               );
                               if (amount == null || amount <= 0) {
-                                return 'Received amount must be greater than 0.';
+                                return 'received_amount_error'.tr;
                               }
                               return null;
                             },
@@ -336,7 +336,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Payment Status',
+                              'payment_status'.tr,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: color.withValues(alpha: 0.92),
                                 fontWeight: FontWeight.w700,
@@ -368,7 +368,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               }),
               const SizedBox(height: 16),
               _CheckoutSectionCard(
-                title: 'Payment Proof',
+                title: 'payment_proof'.tr,
                 icon: Icons.image_outlined,
                 child: Obx(
                   () => _PaymentImageSection(
@@ -383,7 +383,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 16),
               _CheckoutSectionCard(
-                title: 'Additional Note',
+                title: 'additional_note'.tr,
                 icon: Icons.sticky_note_2_outlined,
                 child: CustomTextField(
                   label: 'note'.tr,
@@ -430,8 +430,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final publishedPayments = paymentController.publishedPayments;
     if (publishedPayments.isEmpty) {
       Get.snackbar(
-        'Payment required',
-        'Create and publish at least one payment method first.',
+        'payment_required'.tr,
+        'create_payment_first'.tr,
       );
       return;
     }
@@ -439,8 +439,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final selectedPayment = _findSelectedPayment(publishedPayments);
     if (selectedPayment == null) {
       Get.snackbar(
-        'Payment required',
-        'Choose a valid payment method before completing the sale.',
+        'payment_required'.tr,
+        'choose_payment_error'.tr,
       );
       return;
     }
@@ -451,8 +451,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (selectedAccounts.isNotEmpty &&
         controller.selectedPaymentAccountId.value == null) {
       Get.snackbar(
-        'Account required',
-        'Choose a payment account for ${selectedPayment.name}.',
+        'account_required'.tr,
+        'choose_payment_account'.tr.replaceAll('@name', selectedPayment.name),
       );
       return;
     }
@@ -461,8 +461,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
         double.tryParse(_receivedController.text.trim()) ?? 0;
     if (receivedAmount <= 0) {
       Get.snackbar(
-        'Received amount required',
-        'Received amount must be greater than 0.',
+        'received_amount_required'.tr,
+        'received_amount_error'.tr,
       );
       return;
     }
@@ -601,7 +601,7 @@ class _CheckoutHero extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$totalQuantity ${'qty'.tr} ready to finalize',
+                      '$totalQuantity ${'qty'.tr} ${'ready_to_finalize'.tr}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.86),
                       ),
@@ -740,7 +740,7 @@ class _CompactPaymentSelector extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'No payment methods available',
+                      'no_payment_methods'.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -748,13 +748,13 @@ class _CompactPaymentSelector extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: onManagePayments,
-                    child: const Text('Open Payments'),
+                    child: Text('open_payments'.tr),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Create and publish a payment method first.',
+                'create_payment_first'.tr,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.textTheme.bodySmall?.color?.withValues(
                     alpha: 0.72,

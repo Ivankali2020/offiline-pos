@@ -43,10 +43,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     final hasSlip = (widget.order.imagePath ?? '').trim().isNotEmpty;
 
     return AppScaffold(
-      title: 'Thermal Receipt',
+      title: 'thermal_receipt'.tr,
       appBar: CustomAppBar(
-        title: 'Thermal Receipt',
-        subtitle: 'Detailed sales receipt and invoice overview.',
+        title: 'thermal_receipt'.tr,
+        subtitle: 'receipt_subtitle'.tr,
         actions: hasSlip
             ? [
                 IconButton(
@@ -55,7 +55,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     Icons.receipt_long_rounded,
                     color: theme.colorScheme.primary,
                   ),
-                  tooltip: 'View slip',
+                  tooltip: 'payment_slip'.tr,
                 ),
               ]
             : null,
@@ -75,7 +75,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  'Unable to load order detail.',
+                  'unable_to_load_order'.tr,
                   style: theme.textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -100,7 +100,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       OutlinedButton.icon(
                         onPressed: () => Get.back(),
                         icon: const Icon(Icons.arrow_back_rounded),
-                        label: const Text('Back to order history'),
+                        label: Text('back_to_order_history'.tr),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(52),
                           shape: RoundedRectangleBorder(
@@ -129,11 +129,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     final storeName = _displayText(settings?.storeName, fallback: 'AB POS');
     final receiptHeader = _displayText(
       settings?.receiptHeader,
-      fallback: 'THERMAL SALES RECEIPT',
+      fallback: 'thermal_sales_receipt'.tr,
     );
     final receiptFooter = _displayText(
       settings?.receiptFooter,
-      fallback: 'Please come again',
+      fallback: 'please_come_again'.tr,
     );
     final currencyCode = _displayText(settings?.currencyCode, fallback: 'MMK');
     final receiptPhone = (settings?.receiptPhone ?? '').trim();
@@ -214,28 +214,28 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const _PerforatedDivider(),
                 const SizedBox(height: 12),
                 _ReceiptLine(
-                  label: 'Invoice',
+                  label: 'invoice'.tr,
                   value: order.invoiceNumber,
                   textStyle: monoBase,
                 ),
                 _ReceiptLine(
-                  label: 'Status',
+                  label: 'status'.tr,
                   value: order.status.toUpperCase(),
                   textStyle: monoBase,
                 ),
                 _ReceiptLine(
-                  label: 'Customer',
+                  label: 'customer'.tr,
                   value: _displayText(
                     order.customerName,
-                    fallback: 'Walk-in Customer',
+                    fallback: 'walk_in_customer'.tr,
                   ),
                   textStyle: monoBase,
                 ),
                 _ReceiptLine(
-                  label: 'Phone',
+                  label: 'phone'.tr,
                   value: _displayText(
                     order.customerPhone,
-                    fallback: 'Not provided',
+                    fallback: 'not_provided'.tr,
                   ),
                   textStyle: monoBase,
                 ),
@@ -243,7 +243,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const _PerforatedDivider(),
                 const SizedBox(height: 10),
                 Text(
-                  'ITEMS',
+                  'items'.tr,
                   style: monoBase?.copyWith(
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1,
@@ -252,7 +252,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const SizedBox(height: 8),
                 if (items.isEmpty)
                   Text(
-                    'No order items found.',
+                    'no_order_items_found'.tr,
                     style: monoBase,
                     textAlign: TextAlign.center,
                   )
@@ -262,26 +262,26 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const _PerforatedDivider(),
                 const SizedBox(height: 12),
                 _SummaryRow(
-                  label: 'Subtotal',
+                  label: 'subtotal'.tr,
                   value:
                       '$currencyCode ${_currencyFormat.format(order.subTotal)}',
                   textStyle: monoBase,
                 ),
                 _SummaryRow(
-                  label: 'Delivery Fee',
+                  label: 'delivery_fee'.tr,
                   value:
                       '$currencyCode ${_currencyFormat.format(order.deliveryFees)}',
                   textStyle: monoBase,
                 ),
                 _SummaryRow(
-                  label: 'Tax (${order.tax.toStringAsFixed(0)}%)',
+                  label: 'tax_rate'.tr.replaceAll('@tax', order.tax.toStringAsFixed(0)),
                   value:
                       '$currencyCode ${_currencyFormat.format(order.taxPrice)}',
                   textStyle: monoBase,
                 ),
                 const SizedBox(height: 8),
                 _SummaryRow(
-                  label: 'TOTAL',
+                  label: 'total_caps'.tr,
                   value:
                       '$currencyCode ${_currencyFormat.format(order.totalPrice)}',
                   isEmphasis: true,
@@ -289,20 +289,20 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 ),
                 const SizedBox(height: 10),
                 _SummaryRow(
-                  label: 'Paid',
+                  label: 'paid'.tr,
                   value:
                       '$currencyCode ${_currencyFormat.format(order.givenAmount)}',
                   textStyle: monoBase,
                 ),
                 _SummaryRow(
-                  label: 'Change',
+                  label: 'change'.tr,
                   value:
                       '$currencyCode ${_currencyFormat.format(order.changeAmount)}',
                   textStyle: monoBase,
                   valueColor: Colors.green.shade700,
                 ),
                 _SummaryRow(
-                  label: 'Paid By',
+                  label: 'paid_by'.tr,
                   value: paymentName.toUpperCase(),
                   textStyle: monoBase,
                 ),
@@ -311,7 +311,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   const _PerforatedDivider(),
                   const SizedBox(height: 12),
                   Text(
-                    'NOTE',
+                    'note_caps'.tr,
                     style: monoBase?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1,
@@ -324,7 +324,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const _PerforatedDivider(),
                 const SizedBox(height: 12),
                 Text(
-                  'Thank you for your purchase',
+                  'thank_you_purchase'.tr,
                   textAlign: TextAlign.center,
                   style: monoBase?.copyWith(fontWeight: FontWeight.w700),
                 ),
@@ -344,14 +344,34 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   Widget _buildItemRow(BuildContext context, OrderProduct item) {
     final itemTotal = item.price * item.quantity;
-    final title = item.productName ?? 'Product #${item.productId}';
+    final title = item.productName ?? 'product_id_fallback'.tr.replaceAll('@id', item.productId.toString());
     final subtitleParts = <String>[];
 
     if ((item.variantName ?? '').trim().isNotEmpty) {
       subtitleParts.add(item.variantName!.trim());
     }
-    if ((item.attributes ?? '').trim().isNotEmpty) {
-      subtitleParts.add(item.attributes!.trim());
+    if (item.attributes != null && item.attributes!.isNotEmpty) {
+      final attrStrings = <String>[];
+      for (final attr in item.attributes!) {
+        if (attr is Map<String, dynamic>) {
+          final name = attr['attribute']?.toString() ?? '';
+          final val = attr['value'];
+          if (name.isNotEmpty) {
+            if (val is List && val.isNotEmpty) {
+              attrStrings.add('$name: ${val.join(', ')}');
+            } else if (val != null) {
+              attrStrings.add('$name: $val');
+            } else {
+              attrStrings.add(name);
+            }
+          }
+        } else {
+          attrStrings.add(attr.toString());
+        }
+      }
+      if (attrStrings.isNotEmpty) {
+        subtitleParts.add(attrStrings.join(' | '));
+      }
     }
 
     final secondary = subtitleParts.isEmpty
@@ -406,16 +426,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   String _paymentName(int? paymentId) {
-    if (paymentId == null) return 'Unknown';
+    if (paymentId == null) return 'unknown'.tr;
 
     for (final payment in _paymentController.payments) {
       if (payment.id == paymentId) {
         final name = payment.name.trim();
-        return name.isEmpty ? 'Unknown' : name;
+        return name.isEmpty ? 'unknown'.tr : name;
       }
     }
 
-    return 'Unknown';
+    return 'unknown'.tr;
   }
 
   String _formatDate(String? raw) {
@@ -450,7 +470,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Payment Slip',
+                        'payment_slip'.tr,
                         style: Theme.of(Get.context!).textTheme.titleMedium
                             ?.copyWith(
                               color: Colors.black,
@@ -479,10 +499,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         File(imagePath),
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Padding(
+                          return Padding(
                             padding: EdgeInsets.all(24),
                             child: Text(
-                              'Unable to load slip preview.',
+                              'unable_to_load_slip'.tr,
                               style: TextStyle(color: Colors.white),
                               textAlign: TextAlign.center,
                             ),

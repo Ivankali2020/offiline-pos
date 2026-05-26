@@ -17,10 +17,10 @@ class OrderHistoryPage extends StatelessWidget {
     final currencyFormat = NumberFormat('#,##0', 'en_US');
 
     return AppScaffold(
-      title: 'Order History',
+      title: 'order_history'.tr,
       appBar: CustomAppBar(
-        title: 'Order History',
-        subtitle: 'Track every sale and open receipt details instantly.',
+        title: 'order_history'.tr,
+        subtitle: 'order_history_subtitle'.tr,
         actions: [
           Obx(
             () => Padding(
@@ -180,8 +180,8 @@ class _OrderHistoryOverview extends StatelessWidget {
                   children: [
                     Text(
                       hasActiveFilters
-                          ? 'Filtered Order Results'
-                          : 'Order History',
+                          ? 'filtered_order_results'.tr
+                          : 'order_history'.tr,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -190,8 +190,8 @@ class _OrderHistoryOverview extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       hasActiveFilters
-                          ? 'Showing $visibleOrderCount of $totalOrderCount orders'
-                          : 'Showing $visibleOrderCount orders ready to review',
+                          ? 'showing_filtered_orders'.tr.replaceAll('@visible', '$visibleOrderCount').replaceAll('@total', '$totalOrderCount')
+                          : 'showing_orders_ready'.tr.replaceAll('@visible', '$visibleOrderCount'),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.85),
                       ),
@@ -209,8 +209,8 @@ class _OrderHistoryOverview extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text(
-                    'FILTERED',
+                  child: Text(
+                    'filtered_badge'.tr,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -225,14 +225,14 @@ class _OrderHistoryOverview extends StatelessWidget {
             children: [
               Expanded(
                 child: _OverviewTile(
-                  label: 'Orders',
+                  label: 'orders'.tr,
                   value: '$visibleOrderCount',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _OverviewTile(
-                  label: 'Sales Total',
+                  label: 'sales_total'.tr,
                   value: 'MMK ${currencyFormat.format(totalSales)}',
                 ),
               ),
@@ -314,15 +314,15 @@ class _ActiveFilterBar extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Active Filters',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                  'active_filters'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),
               TextButton(
                 onPressed: controller.clearFilters,
-                child: const Text('Clear All'),
+                child: Text('clear_all'.tr),
               ),
             ],
           ),
@@ -333,13 +333,12 @@ class _ActiveFilterBar extends StatelessWidget {
             children: [
               if (controller.invoiceFilter.value.trim().isNotEmpty)
                 _FilterChip(
-                  label: 'Invoice: ${controller.invoiceFilter.value.trim()}',
+                  label: 'filter_invoice'.tr.replaceAll('@value', controller.invoiceFilter.value.trim()),
                 ),
               if (controller.filterStartDate.value != null ||
                   controller.filterEndDate.value != null)
                 _FilterChip(
-                  label:
-                      'Date: ${_formatRange(controller.filterStartDate.value, controller.filterEndDate.value)}',
+                  label: 'filter_date'.tr.replaceAll('@range', _formatRange(controller.filterStartDate.value, controller.filterEndDate.value)),
                 ),
             ],
           ),
@@ -354,10 +353,10 @@ class _ActiveFilterBar extends StatelessWidget {
       return '${formatter.format(start)} - ${formatter.format(end)}';
     }
     if (start != null) {
-      return 'From ${formatter.format(start)}';
+      return 'from_date'.tr.replaceAll('@start', formatter.format(start));
     }
     if (end != null) {
-      return 'Until ${formatter.format(end)}';
+      return 'until_date'.tr.replaceAll('@end', formatter.format(end));
     }
     return '-';
   }
@@ -403,11 +402,11 @@ class _OrderHistoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final customerLabel = order.customerName?.trim().isNotEmpty == true
         ? order.customerName!.trim()
-        : 'Walk-in Customer';
+        : 'walk_in_customer'.tr;
     final phoneLabel = order.customerPhone?.trim().isNotEmpty == true
         ? order.customerPhone!.trim()
-        : 'No phone';
-    final paidLabel = 'Paid ${currencyFormat.format(order.givenAmount)}';
+        : 'no_phone'.tr;
+    final paidLabel = 'paid_amount'.tr.replaceAll('@amount', currencyFormat.format(order.givenAmount));
 
     return Material(
       color: Colors.transparent,
@@ -504,7 +503,7 @@ class _OrderHistoryCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Grand Total',
+                              'grand_total'.tr,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.textTheme.bodyMedium?.color
                                     ?.withValues(alpha: 0.70),
@@ -533,9 +532,9 @@ class _OrderHistoryCard extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Text(
-                              'Receipt',
+                              'receipt'.tr,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -563,7 +562,7 @@ class _OrderHistoryCard extends StatelessWidget {
 
   String _formatDate(String? raw) {
     if (raw == null || raw.trim().isEmpty) {
-      return 'Unknown date';
+      return 'unknown_date'.tr;
     }
 
     final parsed = DateTime.tryParse(raw);
@@ -606,14 +605,14 @@ class _EmptyFilterResult extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'No matching orders',
+                'no_matching_orders'.tr,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Try another invoice number or a different date range.',
+                'try_another_order_filter'.tr,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.75),
@@ -623,7 +622,7 @@ class _EmptyFilterResult extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onClear,
                 icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text('Clear filters'),
+                label: Text('clear_filters'.tr),
               ),
             ],
           ),
@@ -741,14 +740,14 @@ class _EmptyOrderHistory extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              'No orders yet',
+              'no_orders_yet'.tr,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Completed sales will appear here with a receipt-style detail view.',
+              'no_orders_subtitle'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.75),

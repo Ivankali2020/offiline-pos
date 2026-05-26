@@ -14,6 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleWidget,
     this.actions,
     this.iconColor,
+    this.actionIconColor,
   });
 
   final String title;
@@ -25,11 +26,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? titleWidget;
   final List<Widget>? actions;
   final Color? iconColor;
+  final Color? actionIconColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final resolvedIconColor = iconColor ?? theme.colorScheme.onSurface;
+    final resolvedActionIconColor =
+        actionIconColor ?? theme.colorScheme.primary;
 
     return AppBar(
       leading: IconButton(
@@ -72,7 +76,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       backgroundColor: backgroundColor ?? theme.scaffoldBackgroundColor,
       iconTheme: IconThemeData(color: resolvedIconColor),
-      actionsIconTheme: IconThemeData(color: resolvedIconColor),
+      actionsIconTheme: IconThemeData(color: resolvedActionIconColor),
       elevation: 0,
       scrolledUnderElevation: 0,
     );

@@ -34,15 +34,15 @@ class _ExpensePageState extends State<ExpensePage> {
     final categoryController = Get.find<ExpenseCategoryController>();
 
     return AppScaffold(
-      title: 'Expenses',
+      title: 'expenses'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: CustomAppBar(
-        title: 'Expenses',
-        subtitle: 'Record spending and keep net profit grounded in real costs.',
+        title: 'expenses'.tr,
+        subtitle: 'expenses_subtitle'.tr,
         titleWidget: _showSearch
             ? _SearchField(
                 controller: _searchController,
-                hintText: 'Search expenses',
+                hintText: 'search_expenses'.tr,
                 onChanged: (value) =>
                     expenseController.searchQuery.value = value,
                 onClear: () {
@@ -118,9 +118,9 @@ class _ExpensePageState extends State<ExpensePage> {
                             children: [
                               Expanded(
                                 child: _SectionLabel(
-                                  title: 'Recent Expenses',
+                                  title: 'recent_expenses'.tr,
                                   subtitle:
-                                      '${filteredExpenses.length} records ready to review',
+                                      'records_ready_to_review'.tr.replaceAll('@count', '${filteredExpenses.length}'),
                                 ),
                               ),
                               OutlinedButton.icon(
@@ -166,7 +166,7 @@ class _ExpensePageState extends State<ExpensePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showExpenseSheet(context),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Add Expense'),
+        label: Text('add_expense'.tr),
       ),
     );
   }
@@ -178,8 +178,8 @@ class _ExpensePageState extends State<ExpensePage> {
 
     if (categories.isEmpty) {
       Get.snackbar(
-        'Expense categories needed',
-        'Create an expense category first.',
+        'expense_categories_needed'.tr,
+        'create_expense_category_first'.tr,
       );
       Get.toNamed(AppRoutes.expenseCategories);
       return;
@@ -207,8 +207,8 @@ class _ExpensePageState extends State<ExpensePage> {
       StatefulBuilder(
         builder: (context, setModalState) {
           return _SheetScaffold(
-            title: expense == null ? 'Add Expense' : 'Edit Expense',
-            subtitle: 'Capture the amount, category, payment method, and date.',
+            title: expense == null ? 'add_expense'.tr : 'edit_expense'.tr,
+            subtitle: 'expense_sheet_subtitle'.tr,
             child: Column(
               children: [
                 _TransactionTypeSelector(
@@ -220,7 +220,7 @@ class _ExpensePageState extends State<ExpensePage> {
                 DropdownButtonFormField<int>(
                   initialValue: selectedCategoryId,
                   decoration: InputDecoration(
-                    labelText: 'Expense Category',
+                    labelText: 'expense_category_label'.tr,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -244,7 +244,7 @@ class _ExpensePageState extends State<ExpensePage> {
                 const SizedBox(height: 14),
                 CustomTextField(
                   controller: amountController,
-                  label: 'Amount',
+                  label: 'amount'.tr,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
@@ -255,7 +255,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     Expanded(
                       child: CustomTextField(
                         controller: paymentMethodController,
-                        label: 'Payment Method',
+                        label: 'payment_method'.tr,
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -293,7 +293,7 @@ class _ExpensePageState extends State<ExpensePage> {
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(
-                            labelText: 'Expense Date',
+                            labelText: 'expense_date'.tr,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -324,7 +324,7 @@ class _ExpensePageState extends State<ExpensePage> {
                 const SizedBox(height: 14),
                 CustomTextField(
                   controller: descriptionController,
-                  label: 'Description',
+                  label: 'description'.tr,
                   maxLines: 3,
                 ),
                 const SizedBox(height: 20),
@@ -333,7 +333,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Get.back(),
-                        child: const Text('Cancel'),
+                        child: Text('cancel'.tr),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -348,8 +348,8 @@ class _ExpensePageState extends State<ExpensePage> {
                               amount == null ||
                               amount <= 0) {
                             Get.snackbar(
-                              'Missing details',
-                              'Choose a category and enter a valid amount.',
+                              'missing_details'.tr,
+                              'choose_category_and_amount'.tr,
                             );
                             return;
                           }
@@ -378,7 +378,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               : expenseController.updateExpense(nextExpense));
                           Get.back();
                         },
-                        child: const Text('Save'),
+                        child: Text('save'.tr),
                       ),
                     ),
                   ],
@@ -398,19 +398,19 @@ class _ExpensePageState extends State<ExpensePage> {
 
     Get.bottomSheet(
       _SheetScaffold(
-        title: 'Delete Expense',
-        subtitle: 'This removes the record and updates dashboard totals.',
+        title: 'delete_expense'.tr,
+        subtitle: 'delete_expense_subtitle'.tr,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Delete ${expense.categoryName ?? 'this expense'}?'),
+            Text('delete_confirm_name'.tr.replaceAll('@name', expense.categoryName ?? 'this expense')),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -424,7 +424,7 @@ class _ExpensePageState extends State<ExpensePage> {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Delete'),
+                    child: Text('delete'.tr),
                   ),
                 ),
               ],
@@ -527,9 +527,9 @@ class _ExpenseOverview extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Expense Overview',
+                  'expense_overview'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -551,8 +551,8 @@ class _ExpenseOverview extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(LucideIcons.chartPie, size: 16),
-                label: const Text(
-                  'Charts',
+                label: Text(
+                  'charts'.tr,
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
@@ -560,7 +560,7 @@ class _ExpenseOverview extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '$totalEntries records in view',
+            'records_in_view'.tr.replaceAll('@count', '$totalEntries'),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.82)),
           ),
           const SizedBox(height: 16),
@@ -571,21 +571,21 @@ class _ExpenseOverview extends StatelessWidget {
               SizedBox(
                 width: 220,
                 child: _OverviewTile(
-                  label: 'Total Expense',
+                  label: 'total_expense'.tr,
                   value: 'MMK ${currencyFormat.format(totalAmount)}',
                 ),
               ),
               SizedBox(
                 width: 150,
                 child: _OverviewTile(
-                  label: 'Avg. Entry',
+                  label: 'avg_entry'.tr,
                   value: 'MMK ${currencyFormat.format(averageAmount)}',
                 ),
               ),
               SizedBox(
                 width: 120,
                 child: _OverviewTile(
-                  label: 'Categories',
+                  label: 'categories'.tr,
                   value: '$totalCategories',
                 ),
               ),

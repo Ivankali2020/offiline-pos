@@ -110,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
     AppBottomSheet.show<void>(
       context,
       title: 'language'.tr,
-      subtitle: 'Choose the display language used across your workspace.',
+      subtitle: 'language_subtitle'.tr,
       child: Column(
         children: localeOptions.map((locale) {
           final isSelected = locale.languageCode == currentLocale.languageCode;
@@ -121,8 +121,8 @@ class _SettingsPageState extends State<SettingsPage> {
               flag: locale.languageCode == 'en' ? '🇺🇸' : '🇲🇲',
               title: locale.languageCode == 'en' ? 'English' : 'Myanmar',
               subtitle: locale.languageCode == 'en'
-                  ? 'Use English labels and messages'
-                  : 'Use Myanmar labels and messages',
+                  ? 'english_subtitle'.tr
+                  : 'myanmar_subtitle'.tr,
               isSelected: isSelected,
               onTap: () {
                 Get.updateLocale(locale);
@@ -142,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: CustomAppBar(
         title: 'settings'.tr,
-        subtitle: 'Update store setup and preferences',
+        subtitle: 'settings_subtitle'.tr,
         leadingIcon: LucideIcons.settings,
         actions: [
           IconButton(
@@ -188,8 +188,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16),
               _buildSectionCard(
                 title: 'store_info'.tr,
-                subtitle:
-                    'Basic store identity used across the app and receipt output.',
+                subtitle: 'store_info_subtitle'.tr,
                 child: Column(
                   children: [
                     CustomTextField(
@@ -204,13 +203,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 14),
                     CustomTextField(
                       controller: _receiptPhoneController,
-                      label: 'Receipt Phone',
+                      label: 'receipt_phone'.tr,
                       keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 14),
                     CustomTextField(
                       controller: _receiptAddressController,
-                      label: 'Receipt Address',
+                      label: 'receipt_address'.tr,
                       maxLines: 2,
                     ),
                   ],
@@ -270,8 +269,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16),
               _buildSectionCard(
                 title: 'receipt'.tr,
-                subtitle:
-                    'These lines appear on the order receipt header and footer.',
+                subtitle: 'receipt_subtitle'.tr,
                 child: Column(
                   children: [
                     CustomTextField(
@@ -290,9 +288,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                title: 'Backup & Restore',
-                subtitle:
-                    'Protect data with full SQLite backups, restore from backup, or reset the app.',
+                title: 'backup_restore'.tr,
+                subtitle: 'backup_restore_subtitle'.tr,
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Container(
@@ -309,22 +306,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  title: const Text(
-                    'Open Backup Tools',
-                    style: TextStyle(fontWeight: FontWeight.w800),
+                  title: Text(
+                    'open_backup_tools'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  subtitle: const Text(
-                    'Export backup files, restore another device, and reset data safely.',
-                  ),
+                  subtitle: Text('open_backup_tools_subtitle'.tr),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => Get.toNamed(AppRoutes.backup),
                 ),
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                title: 'Import Data',
-                subtitle:
-                    'Bulk-import products, categories, brands, and expenses from CSV files.',
+                title: 'import_data'.tr,
+                subtitle: 'import_data_subtitle'.tr,
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Container(
@@ -339,13 +333,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Color(0xFF2563EB),
                     ),
                   ),
-                  title: const Text(
-                    'Open Import Tools',
-                    style: TextStyle(fontWeight: FontWeight.w800),
+                  title: Text(
+                    'open_import_tools'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  subtitle: const Text(
-                    'Download sample CSV templates and import your data in bulk.',
-                  ),
+                  subtitle: Text('open_import_tools_subtitle'.tr),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => Get.toNamed(AppRoutes.csvImport),
                 ),
@@ -377,9 +369,9 @@ class _SettingsPageState extends State<SettingsPage> {
               color: Colors.white.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: const Text(
-              'Store Setup',
-              style: TextStyle(
+            child: Text(
+              'store_setup'.tr,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
               ),
@@ -398,7 +390,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Keep receipt identity, contact details, and currency preferences in one compact place.',
+            'store_setup_subtitle'.tr,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.78),
               height: 1.4,

@@ -12,14 +12,14 @@ class OrderFilterBottomSheet extends StatefulWidget {
   static Future<void> show(BuildContext context, OrderController controller) {
     return AppBottomSheet.show<void>(
       context,
-      title: 'Filter Orders',
-      subtitle: 'Filter by invoice number and date range.',
+      title: 'filter_orders'.tr,
+      subtitle: 'filter_orders_subtitle'.tr,
       trailing: TextButton(
         onPressed: () {
           controller.clearFilters();
           Get.back<void>();
         },
-        child: const Text('Reset'),
+        child: Text('reset'.tr),
       ),
       child: OrderFilterBottomSheet(controller: controller),
     );
@@ -62,7 +62,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Invoice Number',
+          'invoice_number'.tr,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -71,14 +71,14 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
         TextField(
           controller: _invoiceController,
           decoration: InputDecoration(
-            hintText: 'Search invoice no...',
+            hintText: 'search_invoice_no'.tr,
             prefixIcon: const Icon(Icons.receipt_long_rounded),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           ),
         ),
         const SizedBox(height: 24),
         Text(
-          'Quick Date Filters',
+          'quick_date_filters'.tr,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -88,9 +88,9 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _buildPresetChip(OrderDateFilterPreset.today, 'Today'),
-            _buildPresetChip(OrderDateFilterPreset.thisWeek, 'This Week'),
-            _buildPresetChip(OrderDateFilterPreset.thisMonth, 'This Month'),
+            _buildPresetChip(OrderDateFilterPreset.today, 'today'.tr),
+            _buildPresetChip(OrderDateFilterPreset.thisWeek, 'this_week'.tr),
+            _buildPresetChip(OrderDateFilterPreset.thisMonth, 'this_month'.tr),
           ],
         ),
         const SizedBox(height: 24),
@@ -98,7 +98,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Custom Date Range',
+              'custom_date_range'.tr,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -113,7 +113,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
                   });
                 },
                 icon: const Icon(Icons.clear_rounded, size: 18),
-                label: const Text('Clear dates'),
+                label: Text('clear_dates'.tr),
               ),
           ],
         ),
@@ -122,7 +122,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
           children: [
             Expanded(
               child: _DateButton(
-                label: 'Start Date',
+                label: 'start_date'.tr,
                 value: _formatDate(_startDate),
                 icon: Icons.event_available_rounded,
                 onTap: () => _pickDate(isStart: true),
@@ -131,7 +131,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
             const SizedBox(width: 12),
             Expanded(
               child: _DateButton(
-                label: 'End Date',
+                label: 'end_date'.tr,
                 value: _formatDate(_endDate),
                 icon: Icons.event_note_rounded,
                 onTap: () => _pickDate(isStart: false),
@@ -151,7 +151,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text('Cancel'),
+                child: Text('cancel'.tr),
               ),
             ),
             const SizedBox(width: 12),
@@ -159,7 +159,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
               child: ElevatedButton.icon(
                 onPressed: _apply,
                 icon: const Icon(Icons.check_circle_outline_rounded),
-                label: const Text('Apply Filters'),
+                label: Text('apply_filters'.tr),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   shape: RoundedRectangleBorder(
@@ -264,7 +264,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
 
   String _formatDate(DateTime? value) {
     if (value == null) {
-      return 'Select date';
+      return 'select_date'.tr;
     }
     return _dateFormat.format(value);
   }

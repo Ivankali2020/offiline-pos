@@ -59,7 +59,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       title: _product.name,
       appBar: CustomAppBar(
         title: _product.name,
-        subtitle: 'Product details, attributes, and variants.',
+        subtitle: 'product_details_subtitle'.tr,
         actions: [
           IconButton(
             tooltip: 'edit'.tr,
@@ -102,23 +102,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 16),
                 _DetailSection(
-                  title: 'Inventory',
+                  title: 'inventory'.tr,
                   icon: LucideIcons.package,
                   child: Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
                       _InfoPill(
-                        label: 'Stock',
+                        label: 'stock'.tr,
                         value: '${_product.stockQuantity}',
                       ),
                       _InfoPill(
-                        label: 'Buy',
+                        label: 'buy_price'.tr,
                         value:
                             'MMK ${_currencyFormat.format(_product.buyPrice)}',
                       ),
                       _InfoPill(
-                        label: 'Sell',
+                        label: 'sell_price'.tr,
                         value:
                             'MMK ${_currencyFormat.format(_product.sellPrice)}',
                       ),
@@ -127,10 +127,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 16),
                 _DetailSection(
-                  title: 'Attributes',
+                  title: 'attributes_title'.tr,
                   icon: LucideIcons.listTree,
                   child: _attributes.isEmpty
-                      ? const Text('No attributes selected.')
+                      ? Text('no_attributes_selected'.tr)
                       : Wrap(
                           spacing: 10,
                           runSpacing: 10,

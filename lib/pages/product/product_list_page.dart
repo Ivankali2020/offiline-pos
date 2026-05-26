@@ -40,7 +40,7 @@ class _ProductListPageState extends State<ProductListPage> {
       title: 'products'.tr,
       appBar: CustomAppBar(
         title: 'products'.tr,
-        subtitle: 'Manage inventory and product filters',
+        subtitle: 'manage_products_subtitle'.tr,
         leadingIcon: LucideIcons.menu,
         iconColor: theme.colorScheme.primary,
         titleWidget: _showSearch
@@ -80,7 +80,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 clipBehavior: Clip.none,
                 children: [
                   IconButton(
-                    tooltip: 'Filter products',
+                    tooltip: 'filter_products_tooltip'.tr,
                     color: theme.colorScheme.primary,
                     onPressed: () =>
                         ProductFilterBottomSheet.show(context, controller),
@@ -180,7 +180,7 @@ class _ProductListPageState extends State<ProductListPage> {
     Get.dialog(
       AlertDialog(
         title: Text('delete'.tr),
-        content: Text('Are you sure you want to delete "${product.name}"?'),
+        content: Text('delete_product_confirm'.tr.replaceAll('@name', product.name)),
         actions: [
           TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
           TextButton(
@@ -436,7 +436,7 @@ class _ProductCard extends StatelessWidget {
                           color: theme.colorScheme.primary,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -446,7 +446,7 @@ class _ProductCard extends StatelessWidget {
                             ),
                             SizedBox(width: 6),
                             Text(
-                              'Edit',
+                              'edit'.tr,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -472,7 +472,7 @@ class _ProductCard extends StatelessWidget {
                           border: Border.all(color: Colors.red),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -482,7 +482,7 @@ class _ProductCard extends StatelessWidget {
                             ),
                             SizedBox(width: 6),
                             Text(
-                              'Delete',
+                              'delete'.tr,
                               style: TextStyle(
                                 color: Colors.red,
                                 fontWeight: FontWeight.w700,
@@ -514,7 +514,7 @@ class _ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'Stock: ${product.stockQuantity}',
+        'stock'.tr + ': ${product.stockQuantity}',
         style: TextStyle(
           color: color,
           fontSize: 9,

@@ -193,7 +193,7 @@ class _ProductAttributeSelector extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'No values for this attribute.',
+                'no_values_for_attribute'.tr,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.red,
                   fontWeight: FontWeight.w700,
@@ -254,7 +254,7 @@ class _VariantAttributeEditor extends StatelessWidget {
           ),
           if (drafts.isEmpty)
             Text(
-              'No attributes selected yet.',
+              'no_attributes_selected_yet'.tr,
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
@@ -641,7 +641,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                         ),
                         const Gap(6),
                         Text(
-                          'Set compact variant details, stock, and pricing in one place.',
+                          'set_compact_variant_details'.tr,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: Colors.grey.shade600),
                         ),
@@ -776,7 +776,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     if (formState == null || !formState.validate()) return;
 
     if (_hasVariant && _variants.isEmpty) {
-      Get.snackbar('Missing variants', 'Add at least one variant first.');
+      Get.snackbar('error'.tr, 'missing_variants_error'.tr);
       return;
     }
 
@@ -1085,8 +1085,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
           color: Colors.black.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(18),
         ),
-        child: const Text(
-          'No attributes selected yet.',
+        child: Text(
+          'no_attributes_selected_yet'.tr,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
@@ -1124,8 +1124,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
   Widget build(BuildContext context) {
     final pageTitle = _editingProduct == null ? 'add_product'.tr : 'edit'.tr;
     final pageSubtitle = _editingProduct == null
-        ? 'Create a new catalog product with pricing, variants, and stock.'
-        : 'Update existing product information, stock levels, or attributes.';
+        ? 'add_product_subtitle'.tr
+        : 'edit_product_subtitle'.tr;
 
     if (_isLoading) {
       return AppScaffold(
@@ -1177,8 +1177,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                         ),
                         child: Text(
                           _editingProduct == null
-                              ? 'Create Product'
-                              : 'Edit Product',
+                              ? 'create_product_btn'.tr
+                              : 'edit_product_btn'.tr,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -1199,8 +1199,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       const Gap(8),
                       Text(
                         _hasVariant
-                            ? 'Manage product details and variants in a compact sheet-based flow.'
-                            : 'Manage core product info, stock, and pricing in a tighter layout.',
+                            ? 'manage_variants_subtitle'.tr
+                            : 'manage_core_info_subtitle'.tr,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.78),
                           height: 1.4,
@@ -1224,9 +1224,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
                               size: 18,
                             ),
                             const SizedBox(width: 10),
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                'Enable variants for size, flavor, or pack-based products.',
+                                'enable_variants_title'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -1250,9 +1250,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 ),
                 const Gap(18),
                 _buildSectionCard(
-                  title: 'Basic Information',
-                  subtitle:
-                      'Start with the product name and how it is grouped.',
+                  title: 'basic_information'.tr,
+                  subtitle: 'basic_information_subtitle'.tr,
                   child: Column(
                     children: [
                       CustomTextField(
@@ -1325,17 +1324,15 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 const Gap(16),
                 if (!_hasVariant)
                   _buildSectionCard(
-                    title: 'Inventory & Pricing',
-                    subtitle:
-                        'Keep base stock and price inputs visible in one compact block.',
+                    title: 'inventory_pricing'.tr,
+                    subtitle: 'inventory_pricing_subtitle'.tr,
                     child: Column(children: _buildInventoryFields()),
                   ),
                 if (!_hasVariant) ...[
                   const Gap(16),
                   _buildSectionCard(
-                    title: 'Attributes',
-                    subtitle:
-                        'Attach attribute values like color, size, or dosage to this product.',
+                    title: 'attributes'.tr,
+                    subtitle: 'attributes_subtitle'.tr,
                     trailing: OutlinedButton.icon(
                       onPressed: _addAttributeDraft,
                       icon: const Icon(LucideIcons.plus, size: 16),
@@ -1346,9 +1343,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 ],
                 if (_hasVariant)
                   _buildSectionCard(
-                    title: 'Variants',
-                    subtitle:
-                        'Each variant gets its own stock and selling price settings.',
+                    title: 'variants'.tr,
+                    subtitle: 'variants_subtitle'.tr,
                     trailing: OutlinedButton.icon(
                       onPressed: _showVariantDialog,
                       icon: const Icon(LucideIcons.plus, size: 16),

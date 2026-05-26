@@ -40,10 +40,10 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
     final theme = Theme.of(context);
 
     return AppScaffold(
-      title: 'Purchase Receipt',
-      appBar: const CustomAppBar(
-        title: 'Purchase Receipt',
-        subtitle: 'Review stock intake details and complete stock import.',
+      title: 'purchase_receipt'.tr,
+      appBar: CustomAppBar(
+        title: 'purchase_receipt'.tr,
+        subtitle: 'purchase_receipt_subtitle'.tr,
       ),
       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(
         alpha: 0.20,
@@ -55,7 +55,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Unable to load purchase detail.'));
+            return Center(child: Text('unable_to_load_purchase_detail'.tr));
           }
 
           final items = snapshot.data ?? const <PurchaseProduct>[];
@@ -74,7 +74,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
                         ElevatedButton.icon(
                           onPressed: _completePurchase,
                           icon: const Icon(Icons.inventory_rounded),
-                          label: const Text('Mark Completed & Import Stock'),
+                          label: Text('mark_completed_import_stock'.tr),
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(52),
                             backgroundColor: const Color(0xFF0F766E),
@@ -88,7 +88,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
                       OutlinedButton.icon(
                         onPressed: () => Get.back(),
                         icon: const Icon(Icons.arrow_back_rounded),
-                        label: const Text('Back to purchase history'),
+                        label: Text('back_to_purchase_history'.tr),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(52),
                         ),
@@ -115,7 +115,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
         _purchase = reloaded;
       }
     });
-    Get.snackbar('Completed', 'Stock quantities were imported successfully.');
+    Get.snackbar('completed'.tr, 'stock_imported_success'.tr);
   }
 
   Widget _buildReceiptCard(
@@ -131,7 +131,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
     );
     final footer = _displayText(
       settings?.receiptFooter,
-      fallback: 'Stock intake record saved',
+      fallback: 'stock_intake_record_saved'.tr,
     );
     final currencyCode = _displayText(settings?.currencyCode, fallback: 'MMK');
     final monoBase = theme.textTheme.bodyMedium?.copyWith(
@@ -190,23 +190,23 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
             const _PerforatedDivider(),
             const SizedBox(height: 12),
             _ReceiptLine(
-              label: 'Invoice',
+              label: 'invoice'.tr,
               value: _purchase.invoiceNumber,
               textStyle: monoBase,
             ),
             _ReceiptLine(
-              label: 'Status',
+              label: 'status'.tr,
               value: _purchase.status.toUpperCase(),
               textStyle: monoBase,
             ),
             _ReceiptLine(
-              label: 'Paid',
+              label: 'paid'.tr,
               value:
                   '$currencyCode ${_currencyFormat.format(_purchase.paidAmount)}',
               textStyle: monoBase,
             ),
             _ReceiptLine(
-              label: 'Due',
+              label: 'due'.tr,
               value:
                   '$currencyCode ${_currencyFormat.format(_purchase.dueAmount)}',
               textStyle: monoBase,
@@ -215,7 +215,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
             const _PerforatedDivider(),
             const SizedBox(height: 10),
             Text(
-              'ITEMS',
+              'items'.tr,
               style: monoBase?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -223,14 +223,14 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
             ),
             const SizedBox(height: 8),
             if (items.isEmpty)
-              Text('No purchase items found.', style: monoBase)
+              Text('no_purchase_items_found'.tr, style: monoBase)
             else
               ...items.map(_buildItemRow),
             const SizedBox(height: 12),
             const _PerforatedDivider(),
             const SizedBox(height: 12),
             _SummaryRow(
-              label: 'TOTAL',
+              label: 'total_caps'.tr,
               value:
                   '$currencyCode ${_currencyFormat.format(_purchase.totalAmount)}',
               isEmphasis: true,
@@ -241,7 +241,7 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
               const _PerforatedDivider(),
               const SizedBox(height: 12),
               Text(
-                'NOTE',
+                'note_caps'.tr,
                 style: monoBase?.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1,
@@ -255,8 +255,8 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
             const SizedBox(height: 12),
             Text(
               _purchase.status.trim().toLowerCase() == 'completed'
-                  ? 'Stock has been imported'
-                  : 'Complete this receipt to import stock',
+                  ? 'stock_has_been_imported'.tr
+                  : 'complete_this_receipt_to_import_stock'.tr,
               textAlign: TextAlign.center,
               style: monoBase?.copyWith(fontWeight: FontWeight.w700),
             ),

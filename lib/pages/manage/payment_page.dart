@@ -31,11 +31,11 @@ class _PaymentPageState extends State<PaymentPage> {
     final theme = Theme.of(context);
 
     return AppScaffold(
-      title: 'Payments',
+      title: 'payments'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: CustomAppBar(
-        title: 'Payments',
-        subtitle: 'Manage payment methods and accounts used during checkout.',
+        title: 'payments'.tr,
+        subtitle: 'manage_payments_subtitle'.tr,
         titleWidget: _showSearch
             ? _SearchField(
                 controller: _searchController,
@@ -128,7 +128,7 @@ class _PaymentPageState extends State<PaymentPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showPaymentSheet(context),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Add Payment'),
+        label: Text('add_payment'.tr),
       ),
     );
   }
@@ -143,8 +143,8 @@ class _PaymentPageState extends State<PaymentPage> {
     Get.bottomSheet(
       isScrollControlled: true,
       _SheetScaffold(
-        title: payment == null ? 'Add Payment' : 'Edit Payment',
-        subtitle: 'Create payment methods that appear during checkout.',
+        title: payment == null ? 'add_payment'.tr : 'edit_payment'.tr,
+        subtitle: 'payment_sheet_subtitle'.tr,
         child: StatefulBuilder(
           builder: (context, setModalState) {
             return Form(
@@ -153,16 +153,16 @@ class _PaymentPageState extends State<PaymentPage> {
                 children: [
                   CustomTextField(
                     controller: nameController,
-                    label: 'Payment Name',
+                    label: 'payment_name'.tr,
                     isRequired: true,
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Payment name is required.'
+                        ? 'payment_name_required'.tr
                         : null,
                   ),
                   const SizedBox(height: 14),
                   CustomTextField(
                     controller: noteController,
-                    label: 'Note',
+                    label: 'note'.tr,
                     maxLines: 3,
                   ),
                   const SizedBox(height: 14),
@@ -174,9 +174,9 @@ class _PaymentPageState extends State<PaymentPage> {
                       });
                     },
                     contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-                    title: const Text('Published in checkout'),
-                    subtitle: const Text(
-                      'Only published payment methods can be selected during sale.',
+                    title: Text('published_in_checkout'.tr),
+                    subtitle: Text(
+                      'published_in_checkout_subtitle'.tr,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -185,7 +185,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Get.back(),
-                          child: const Text('Cancel'),
+                          child: Text('cancel'.tr),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -210,7 +210,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             }
                             Get.back();
                           },
-                          child: const Text('Save'),
+                          child: Text('save'.tr),
                         ),
                       ),
                     ],
@@ -237,28 +237,28 @@ class _PaymentPageState extends State<PaymentPage> {
     Get.bottomSheet(
       isScrollControlled: true,
       _SheetScaffold(
-        title: account == null ? 'Add Account' : 'Edit Account',
-        subtitle: 'Store account name and number for ${payment.name}.',
+        title: account == null ? 'add_account'.tr : 'edit_account'.tr,
+        subtitle: 'account_sheet_subtitle'.tr.replaceAll('@name', payment.name),
         child: Form(
           key: formKey,
           child: Column(
             children: [
               CustomTextField(
                 controller: nameController,
-                label: 'Account Name',
+                label: 'account_name'.tr,
                 isRequired: true,
                 validator: (value) => value == null || value.trim().isEmpty
-                    ? 'Account name is required.'
+                    ? 'account_name_required'.tr
                     : null,
               ),
               const SizedBox(height: 14),
               CustomTextField(
                 controller: numberController,
-                label: 'Account Number',
+                label: 'account_number'.tr,
                 isRequired: true,
                 keyboardType: TextInputType.phone,
                 validator: (value) => value == null || value.trim().isEmpty
-                    ? 'Account number is required.'
+                    ? 'account_number_required'.tr
                     : null,
               ),
               const SizedBox(height: 20),
@@ -267,7 +267,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
+                      child: Text('cancel'.tr),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -292,7 +292,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         }
                         Get.back();
                       },
-                      child: const Text('Save'),
+                      child: Text('save'.tr),
                     ),
                   ),
                 ],
@@ -311,19 +311,19 @@ class _PaymentPageState extends State<PaymentPage> {
 
     Get.bottomSheet(
       _SheetScaffold(
-        title: 'Delete Payment',
-        subtitle: 'This will also remove the linked payment accounts.',
+        title: 'delete_payment'.tr,
+        subtitle: 'delete_payment_subtitle'.tr,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Delete "${payment.name}" and its accounts?'),
+            Text('delete_payment_confirm'.tr.replaceAll('@name', payment.name)),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -337,7 +337,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Delete'),
+                    child: Text('delete'.tr),
                   ),
                 ),
               ],
@@ -355,19 +355,19 @@ class _PaymentPageState extends State<PaymentPage> {
 
     Get.bottomSheet(
       _SheetScaffold(
-        title: 'Delete Account',
-        subtitle: 'Remove this saved account from the payment method.',
+        title: 'delete_account'.tr,
+        subtitle: 'delete_account_subtitle'.tr,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Delete "${account.name}"?'),
+            Text('delete_confirm_name'.tr.replaceAll('@name', account.name)),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -381,7 +381,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Delete'),
+                    child: Text('delete'.tr),
                   ),
                 ),
               ],
@@ -431,8 +431,8 @@ class _OverviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Payment Overview',
+          Text(
+            'payment_overview'.tr,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -441,26 +441,26 @@ class _OverviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '$publishedPayments methods are currently visible in checkout',
+            'published_methods_subtitle'.tr.replaceAll('@count', '$publishedPayments'),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.82)),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _OverviewTile(label: 'Methods', value: '$totalPayments'),
+                child: _OverviewTile(label: 'methods'.tr, value: '$totalPayments'),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _OverviewTile(
-                  label: 'Accounts',
+                  label: 'accounts'.tr,
                   value: '$totalAccounts',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _OverviewTile(
-                  label: 'Published',
+                  label: 'published'.tr,
                   value: '$publishedPayments',
                 ),
               ),
@@ -575,7 +575,7 @@ class _PaymentCard extends StatelessWidget {
                     Text(
                       payment.note?.trim().isNotEmpty == true
                           ? payment.note!
-                          : 'No note added for this payment method.',
+                          : 'no_payment_note'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.textTheme.bodySmall?.color?.withValues(
                           alpha: 0.76,
@@ -590,9 +590,9 @@ class _PaymentCard extends StatelessWidget {
                   if (value == 'edit') onEditPayment();
                   if (value == 'delete') onDeletePayment();
                 },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(value: 'edit', child: Text('Edit')),
-                  PopupMenuItem(value: 'delete', child: Text('Delete')),
+                itemBuilder: (context) =>  [
+                  PopupMenuItem(value: 'edit', child: Text('edit'.tr)),
+                  PopupMenuItem(value: 'delete', child: Text('delete'.tr)),
                 ],
               ),
             ],
@@ -606,14 +606,14 @@ class _PaymentCard extends StatelessWidget {
                 icon: payment.isPublished
                     ? LucideIcons.badgeCheck
                     : LucideIcons.circleOff,
-                label: payment.isPublished ? 'Published' : 'Hidden',
+                label: payment.isPublished ? 'published'.tr : 'hidden'.tr,
                 color: payment.isPublished
                     ? const Color(0xFF0F766E)
                     : const Color(0xFF6B7280),
               ),
               _MetaPill(
                 icon: LucideIcons.landmark,
-                label: '${accounts.length} accounts',
+                label: 'accounts_count'.tr.replaceAll('@count', '${accounts.length}'),
                 color: theme.colorScheme.primary,
               ),
             ],
@@ -623,7 +623,7 @@ class _PaymentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Accounts',
+                  'accounts'.tr,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -632,7 +632,7 @@ class _PaymentCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onAddAccount,
                 icon: const Icon(LucideIcons.plus, size: 16),
-                label: const Text('Add Account'),
+                label: Text('add_account'.tr),
               ),
             ],
           ),
@@ -645,8 +645,8 @@ class _PaymentCard extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Text(
-                'No accounts yet. Add one so checkout can route transfers correctly.',
+              child: Text(
+                'no_accounts_yet'.tr,
               ),
             )
           else

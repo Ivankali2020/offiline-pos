@@ -44,10 +44,10 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
     final crossAxisCount = screenWidth < 600 ? 2 : (screenWidth < 900 ? 3 : 4);
 
     return AppScaffold(
-      title: 'Pick Purchase Products',
+      title: 'pick_purchase_products'.tr,
       appBar: CustomAppBar(
-        title: 'Pick Purchase Products',
-        subtitle: 'Search and scan products to add to purchase receipt.',
+        title: 'pick_purchase_products'.tr,
+        subtitle: 'pick_purchase_products_subtitle'.tr,
         actions: [
           BarcodeScannerButton(
             onScan: (code) {
@@ -56,7 +56,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
               });
               controller.searchQuery.value = code;
               Get.snackbar(
-                'Scanned',
+                'scanned'.tr,
                 code,
                 snackPosition: SnackPosition.BOTTOM,
                 duration: const Duration(seconds: 1),
@@ -83,7 +83,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
                   TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      labelText: 'Search products',
+                      labelText: 'search_products'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -99,7 +99,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
                     children: [
                       Expanded(
                         child: _MiniStat(
-                          title: 'Results',
+                          title: 'results'.tr,
                           value: '${controller.filteredProducts.length}',
                           icon: Icons.grid_view_rounded,
                         ),
@@ -108,7 +108,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
                       Expanded(
                         child: Obx(
                           () => _MiniStat(
-                            title: 'Picked Qty',
+                            title: 'picked_qty'.tr,
                             value: '${cartController.totalQuantity}',
                             icon: Icons.inventory_2_outlined,
                           ),
@@ -124,7 +124,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
             child: Obx(() {
               final products = controller.filteredProducts;
               if (products.isEmpty) {
-                return const Center(child: Text('No products found'));
+                return Center(child: Text('no_products_found'.tr));
               }
               return GridView.builder(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
@@ -177,8 +177,8 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
 
           if (quantity <= 0 || costPrice == null || costPrice < 0) {
             Get.snackbar(
-              'Missing details',
-              'Enter a valid quantity and cost price.',
+              'missing_details'.tr,
+              'enter_valid_qty_cost'.tr,
               snackPosition: SnackPosition.BOTTOM,
             );
             return;
@@ -192,8 +192,8 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
           );
           Get.back();
           Get.snackbar(
-            'Added',
-            '${product.name} added to purchase',
+            'added'.tr,
+            'added_to_purchase'.trParams({'name': product.name}),
             snackPosition: SnackPosition.BOTTOM,
             duration: const Duration(seconds: 1),
           );
@@ -260,7 +260,7 @@ class _AddProductSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Set the purchase details before adding this product.',
+                  'set_purchase_details_before_adding'.tr,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade600,
                   ),
@@ -270,7 +270,7 @@ class _AddProductSheet extends StatelessWidget {
                   controller: quantityController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Quantity',
+                    labelText: 'quantity'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -283,7 +283,7 @@ class _AddProductSheet extends StatelessWidget {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Cost Price',
+                    labelText: 'cost_price'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -296,7 +296,7 @@ class _AddProductSheet extends StatelessWidget {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Sell Price',
+                    labelText: 'sell_price'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -308,14 +308,14 @@ class _AddProductSheet extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Get.back(),
-                        child: const Text('Cancel'),
+                        child: Text('cancel'.tr),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: onSave,
-                        child: const Text('Add'),
+                        child: Text('add'.tr),
                       ),
                     ),
                   ],
@@ -413,7 +413,7 @@ class _PickerCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'Stock ${product.stockQuantity}',
+                  'stock'.tr + ' ${product.stockQuantity}',
                   style: const TextStyle(
                     color: Color(0xFF0F766E),
                     fontSize: 10,
@@ -440,7 +440,7 @@ class _PickerCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Buy MMK ${product.buyPrice.toStringAsFixed(0)}',
+                'buy'.tr + ' MMK ${product.buyPrice.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: Color(0xFF0F766E),
                   fontWeight: FontWeight.bold,
@@ -458,13 +458,13 @@ class _PickerCard extends StatelessWidget {
                   color: const Color(0xFF0F766E),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(LucideIcons.plusCircle, size: 15, color: Colors.white),
                     SizedBox(width: 6),
                     Text(
-                      'Add',
+                      'add'.tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

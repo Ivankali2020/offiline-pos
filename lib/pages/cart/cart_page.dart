@@ -31,7 +31,7 @@ class _CartPageState extends State<CartPage> {
       title: 'pos_sale'.tr,
       appBar: CustomAppBar(
         title: 'pos_sale'.tr,
-        subtitle: 'Create a compact sale invoice and checkout quickly.',
+        subtitle: 'pos_sale_subtitle'.tr,
         // backgroundColor: pageBackground,
       ),
       // backgroundColor: pageBackground,
@@ -123,7 +123,7 @@ class _CartPageState extends State<CartPage> {
                   final index = entry.key;
                   final item = entry.value;
                   return _CartItemCard(
-                    itemName: item.productName ?? 'Product',
+                    itemName: item.productName ?? 'product_singular'.tr,
                     variantName: item.variantName,
                     quantity: item.quantity,
                     unitPrice: item.price,
@@ -185,7 +185,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Browse products and add them to the cart quickly.',
+                    'add_items_subtitle'.tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.textTheme.bodySmall?.color?.withValues(
                         alpha: 0.75,
@@ -266,7 +266,7 @@ class _CartPageState extends State<CartPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Start by adding some products to build this sale.',
+            'cart_empty_subtitle'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.72),
@@ -294,14 +294,14 @@ class _CartInsightRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customer = customerName.trim().isEmpty
-        ? 'Walk-in'
+        ? 'walk_in'.tr
         : customerName.trim();
 
     return Row(
       children: [
         Expanded(
           child: _CartMiniStat(
-            title: 'Items',
+            title: 'items'.tr,
             value: '$totalItems',
             icon: Icons.shopping_bag_outlined,
           ),
@@ -309,7 +309,7 @@ class _CartInsightRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _CartMiniStat(
-            title: 'Subtotal',
+            title: 'subtotal'.tr,
             value: 'MMK ${currencyFormat.format(subTotal)}',
             icon: Icons.payments_outlined,
           ),
@@ -317,7 +317,7 @@ class _CartInsightRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _CartMiniStat(
-            title: 'Customer',
+            title: 'customer'.tr,
             value: customer,
             icon: Icons.person_outline_rounded,
           ),

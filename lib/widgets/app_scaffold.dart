@@ -177,7 +177,7 @@ class _AppDrawer extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Point of sale workspace',
+                      'workspace_subtitle'.tr,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.82),
                       ),
@@ -186,7 +186,7 @@ class _AppDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            buildSectionLabel('MAIN'),
+            buildSectionLabel('main'.tr),
             buildItem(
               'dashboard'.tr,
               AppRoutes.dashboard,
@@ -198,7 +198,7 @@ class _AppDrawer extends StatelessWidget {
               LucideIcons.shoppingCart,
             ),
             buildItem('orders'.tr, AppRoutes.orders, LucideIcons.history),
-            buildSectionLabel('CATALOG'),
+            buildSectionLabel('catalog'.tr),
             buildItem(
               'products'.tr,
               AppRoutes.productList,
@@ -215,36 +215,36 @@ class _AppDrawer extends StatelessWidget {
               AppRoutes.attributes,
               LucideIcons.listTree,
             ),
-            buildSectionLabel('FINANCE'),
-            buildItem('Suppliers', AppRoutes.suppliers, LucideIcons.truck),
+            buildSectionLabel('finance'.tr),
+            buildItem('suppliers'.tr, AppRoutes.suppliers, LucideIcons.truck),
             buildItem(
-              'Payments',
+              'payments'.tr,
               AppRoutes.payments,
               Icons.account_balance_wallet_outlined,
             ),
             buildItem(
-              'Purchases',
+              'purchases'.tr,
               AppRoutes.purchases,
               Icons.inventory_2_rounded,
             ),
             buildItem(
-              'Expenses',
+              'expenses'.tr,
               AppRoutes.expenses,
               Icons.receipt_long_rounded,
             ),
             buildItem(
-              'Expense Categories',
+              'expense_categories'.tr,
               AppRoutes.expenseCategories,
               Icons.account_balance_wallet_rounded,
             ),
-            buildSectionLabel('SYSTEM'),
+            buildSectionLabel('system'.tr),
             buildItem(
-              'Backup & Restore',
+              'backup_restore'.tr,
               AppRoutes.backup,
               Icons.backup_table_rounded,
             ),
             buildItem(
-              'Import Data',
+              'import_data'.tr,
               AppRoutes.csvImport,
               Icons.upload_file_rounded,
             ),

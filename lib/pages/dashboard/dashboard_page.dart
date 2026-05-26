@@ -25,15 +25,14 @@ class DashboardPage extends StatelessWidget {
       includeDrawer: true,
       appBar: CustomAppBar(
         title: 'dashboard'.tr,
-        subtitle:
-            "Monitor orders, sales performance, and catalog actions from one clean workspace.",
+        subtitle: 'dashboard_subtitle'.tr,
         leadingIcon: LucideIcons.settings,
         showDrawerButton: true,
         actions: [
           TextButton.icon(
             onPressed: () => _confirmTestSeedReset(context),
             icon: const Icon(Icons.storage_rounded, size: 18),
-            label: const Text('TestSeed'),
+            label: Text('test_seed'.tr),
           ),
         ],
       ),
@@ -45,15 +44,14 @@ class DashboardPage extends StatelessWidget {
             const SizedBox(height: 18),
             _SectionHeader(
               title: 'overview'.tr,
-              subtitle:
-                  'A compact snapshot of sales, profit, expenses, stock, and catalog size.',
+              subtitle: 'overview_subtitle'.tr,
             ),
             const SizedBox(height: 14),
             _OverviewGrid(controller: controller),
             const SizedBox(height: 30),
             _SectionHeader(
-              title: 'Order Chart',
-              subtitle: 'Filter daily sales trends like order history.',
+              title: 'order_chart'.tr,
+              subtitle: 'order_chart_subtitle'.tr,
               trailing: Obx(
                 () => _FilterButton(
                   count: controller.chartActiveFilterCount,
@@ -72,8 +70,7 @@ class DashboardPage extends StatelessWidget {
             const SizedBox(height: 30),
             _SectionHeader(
               title: 'quick_actions'.tr,
-              subtitle:
-                  'Jump into product, catalog, finance, and order management.',
+              subtitle: 'quick_actions_subtitle'.tr,
             ),
             const SizedBox(height: 14),
             const _QuickActionGrid(),
@@ -91,33 +88,36 @@ class DashboardPage extends StatelessWidget {
 
     switch (preset) {
       case DashboardDateFilterPreset.today:
-        return 'Today';
+        return 'today'.tr;
       case DashboardDateFilterPreset.thisWeek:
-        return 'This Week';
+        return 'this_week'.tr;
       case DashboardDateFilterPreset.thisMonth:
-        return 'This Month';
+        return 'this_month'.tr;
       case DashboardDateFilterPreset.custom:
       case null:
-        if (start == null && end == null) return 'All Dates';
+        if (start == null && end == null) return 'all_dates'.tr;
         if (start != null && end != null) {
-          return '${formatter.format(start)} - ${formatter.format(end)}';
+          return 'date_range'.trParams({
+            'start': formatter.format(start),
+            'end': formatter.format(end),
+          });
         }
-        if (start != null) return 'From ${formatter.format(start)}';
-        return 'Until ${formatter.format(end!)}';
+        if (start != null) {
+          return 'from_date'.trParams({'date': formatter.format(start)});
+        }
+        return 'until_date'.trParams({'date': formatter.format(end!)});
     }
   }
 
   Future<void> _confirmTestSeedReset(BuildContext context) async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Reset and seed database?'),
-        content: const Text(
-          'This will delete local orders, purchases, expenses, and recreate the test seed database.',
-        ),
+        title: Text('reset_seed_title'.tr),
+        content: Text('reset_seed_content'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () => Get.back(result: true),
@@ -125,7 +125,7 @@ class DashboardPage extends StatelessWidget {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Reset'),
+            child: Text('reset'.tr),
           ),
         ],
       ),
@@ -136,8 +136,8 @@ class DashboardPage extends StatelessWidget {
     await DBProvider.instance.resetAndSeedDatabase();
     await _refreshAfterTestSeed();
     Get.snackbar(
-      'TestSeed complete',
-      'Database was reset and seeded successfully.',
+      'test_seed_complete'.tr,
+      'test_seed_success'.tr,
       snackPosition: SnackPosition.BOTTOM,
     );
   }
@@ -224,7 +224,7 @@ class _OverviewGrid extends StatelessWidget {
           ),
           Obx(
             () => _StatCard(
-              label: 'Gross Profit',
+              label: 'gross_profit'.tr,
               value: DashboardPage._numberFormat.format(
                 controller.totalProfit.value,
               ),
@@ -235,7 +235,7 @@ class _OverviewGrid extends StatelessWidget {
           ),
           Obx(
             () => _StatCard(
-              label: 'Expenses',
+              label: 'expenses'.tr,
               value: DashboardPage._numberFormat.format(
                 controller.totalExpenses.value,
               ),
@@ -246,7 +246,7 @@ class _OverviewGrid extends StatelessWidget {
           ),
           Obx(
             () => _StatCard(
-              label: 'Actual Profit',
+              label: 'actual_profit'.tr,
               value: DashboardPage._numberFormat.format(
                 controller.actualProfit,
               ),
@@ -402,7 +402,7 @@ class _FilterButton extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: onPressed,
           icon: const Icon(Icons.tune_rounded, size: 18),
-          label: const Text('Filter'),
+          label: Text('filter'.tr),
         ),
         if (count > 0)
           Positioned(
@@ -462,7 +462,7 @@ class _OrderTrendCard extends StatelessWidget {
               _InfoChip(icon: LucideIcons.calendarRange, label: filterLabel),
               _InfoChip(
                 icon: LucideIcons.shoppingBag,
-                label: '$totalOrders orders',
+                label: '$totalOrders ${'orders'.tr.toLowerCase()}',
               ),
               _InfoChip(
                 icon: LucideIcons.banknote,
@@ -479,13 +479,13 @@ class _OrderTrendCard extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(LucideIcons.chartNoAxesCombined, size: 28),
                   SizedBox(height: 10),
                   Text(
-                    'No order trend data in this range.',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    'no_order_trend'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -539,85 +539,85 @@ class _QuickActionGrid extends StatelessWidget {
         final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
         final actions = [
           _QuickActionData(
-            'products'.tr,
-            'Browse product catalog',
-            LucideIcons.layoutGrid,
-            const Color(0xFF2563EB),
-            () => Get.toNamed(AppRoutes.productList),
-          ),
-          _QuickActionData(
-            'brands'.tr,
-            'Manage product brands',
-            LucideIcons.tag,
-            const Color(0xFFEA580C),
-            () => Get.toNamed(AppRoutes.brands),
-          ),
-          _QuickActionData(
-            'categories'.tr,
-            'Manage categories',
-            LucideIcons.layers,
-            const Color(0xFF7C3AED),
-            () => Get.toNamed(AppRoutes.categories),
-          ),
-          _QuickActionData(
-            'attributes'.tr,
-            'Manage product attributes',
-            LucideIcons.listTree,
-            const Color(0xFF0891B2),
-            () => Get.toNamed(AppRoutes.attributes),
-          ),
-          _QuickActionData(
             'new_sale'.tr,
-            'Start checkout flow',
+            'start_checkout'.tr,
             LucideIcons.shoppingCart,
             const Color(0xFF059669),
             () => Get.toNamed(AppRoutes.saleDetails),
           ),
           _QuickActionData(
             'history'.tr,
-            'See order activity',
+            'see_order_activity'.tr,
             LucideIcons.history,
             const Color(0xFFDC2626),
             () => Get.toNamed(AppRoutes.orders),
           ),
           _QuickActionData(
-            'Suppliers',
-            'Manage purchase vendors',
+            'products'.tr,
+            'browse_product_catalog'.tr,
+            LucideIcons.layoutGrid,
+            const Color(0xFF2563EB),
+            () => Get.toNamed(AppRoutes.productList),
+          ),
+          _QuickActionData(
+            'brands'.tr,
+            'manage_brands_subtitle'.tr,
+            LucideIcons.tag,
+            const Color(0xFFEA580C),
+            () => Get.toNamed(AppRoutes.brands),
+          ),
+          _QuickActionData(
+            'categories'.tr,
+            'manage_categories_subtitle'.tr,
+            LucideIcons.layers,
+            const Color(0xFF7C3AED),
+            () => Get.toNamed(AppRoutes.categories),
+          ),
+          _QuickActionData(
+            'attributes'.tr,
+            'manage_attributes_subtitle'.tr,
+            LucideIcons.listTree,
+            const Color(0xFF0891B2),
+            () => Get.toNamed(AppRoutes.attributes),
+          ),
+          _QuickActionData(
+            'suppliers'.tr,
+            'manage_purchase_vendors'.tr,
             LucideIcons.truck,
             const Color(0xFF0369A1),
             () => Get.toNamed(AppRoutes.suppliers),
           ),
           _QuickActionData(
-            'Payments',
-            'Manage payment methods',
+            'payments'.tr,
+            'manage_payment_methods'.tr,
             Icons.account_balance_wallet_outlined,
             const Color(0xFF0F766E),
             () => Get.toNamed(AppRoutes.payments),
           ),
           _QuickActionData(
-            'Purchases',
-            'Receive stock inventory',
+            'purchases'.tr,
+            'receive_stock_inventory'.tr,
             Icons.inventory_2_rounded,
             const Color(0xFF0F766E),
             () => Get.toNamed(AppRoutes.purchases),
           ),
           _QuickActionData(
-            'Expenses',
-            'Track operating costs',
+            'expenses'.tr,
+            'track_operating_costs'.tr,
             Icons.receipt_long_rounded,
             const Color(0xFFB91C1C),
             () => Get.toNamed(AppRoutes.expenses),
           ),
           _QuickActionData(
-            'Expense Categories',
-            'Organize expense types',
+            'expense_categories'.tr,
+            'organize_expense_types'.tr,
             Icons.account_balance_wallet_rounded,
             const Color(0xFF0F766E),
             () => Get.toNamed(AppRoutes.expenseCategories),
           ),
           _QuickActionData(
             'settings'.tr,
-            'Update store setup',
+            'update_store_setup'.tr,
             LucideIcons.settings,
             const Color(0xFF111827),
             () => Get.toNamed(AppRoutes.settings),

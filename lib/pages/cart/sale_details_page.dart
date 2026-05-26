@@ -103,7 +103,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
       title: 'pos_sale'.tr,
       appBar: CustomAppBar(
         title: 'pos_sale'.tr,
-        subtitle: 'Enter invoice and customer details before adding items.',
+        subtitle: 'sale_details_subtitle'.tr,
       ),
       bottomNavigationBar: AppBottomActionBar(
         actionLabel: 'next_step'.tr,
@@ -146,7 +146,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Sale details',
+            'sale_details'.tr,
             style: theme.textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w900,
@@ -154,7 +154,7 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Review invoice info, sale date, and customer details before checkout.',
+            'sale_details_review'.tr,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.82),
               height: 1.35,

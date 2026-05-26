@@ -54,18 +54,18 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
     final theme = Theme.of(context);
 
     return AppScaffold(
-      title: 'New Purchase',
-      appBar: const CustomAppBar(
-        title: 'New Purchase',
-        subtitle: 'Pick products, set cost, and save a pending stock receipt.',
+      title: 'new_purchase'.tr,
+      appBar: CustomAppBar(
+        title: 'new_purchase'.tr,
+        subtitle: 'new_purchase_subtitle'.tr,
       ),
       bottomNavigationBar: Obx(
         () => AppBottomActionBar(
-          summaryLabel: 'Total Purchase',
+          summaryLabel: 'total_purchase'.tr,
           summaryValue:
               'MMK ${_currencyFormat.format(cartController.totalAmount)}',
           summaryValueColor: const Color(0xFF0F766E),
-          actionLabel: 'Save Purchase',
+          actionLabel: 'save_purchase'.tr,
           onPressed: _savePurchase,
         ),
       ),
@@ -119,7 +119,10 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${cartController.totalQuantity} items ready for intake',
+                                'items_ready_for_intake'.trParams({
+                                  'count':
+                                      cartController.totalQuantity.toString(),
+                                }),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.86),
                                 ),
@@ -142,7 +145,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
                       children: [
                         Expanded(
                           child: _HeroChip(
-                            label: 'Paid',
+                            label: 'paid'.tr,
                             value:
                                 'MMK ${_currencyFormat.format(cartController.paidAmount.value)}',
                           ),
@@ -150,7 +153,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _HeroChip(
-                            label: 'Due',
+                            label: 'due'.tr,
                             value:
                                 'MMK ${_currencyFormat.format(cartController.dueAmount)}',
                           ),
@@ -165,7 +168,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
             _buildPurchaseItemsSection(context),
             const SizedBox(height: 16),
             _SectionCard(
-              title: 'Payment Setup',
+              title: 'payment_setup'.tr,
               icon: Icons.payments_outlined,
               child: Column(
                 children: [
@@ -175,7 +178,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
                       decimal: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Paid Amount',
+                      labelText: 'paid_amount'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -186,7 +189,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
                     controller: _noteController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      labelText: 'Note',
+                      labelText: 'note'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -225,7 +228,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Purchase Items',
+                'purchase_items'.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -234,7 +237,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
             OutlinedButton.icon(
               onPressed: () => Get.toNamed(AppRoutes.purchaseProductPicker),
               icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('Add Products'),
+              label: Text('add_products'.tr),
             ),
           ],
         ),
@@ -283,7 +286,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
     );
     await Get.dialog(
       AlertDialog(
-        title: Text('Edit ${item.productName ?? 'Purchase Item'}'),
+        title: Text('edit'.tr + ' ${item.productName ?? 'purchase_items'.tr}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -298,7 +301,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-              decoration: const InputDecoration(labelText: 'Cost Price'),
+              decoration: InputDecoration(labelText: 'cost_price'.tr),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -306,12 +309,12 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-              decoration: const InputDecoration(labelText: 'Sell Price'),
+              decoration: InputDecoration(labelText: 'sell_price'.tr),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
           ElevatedButton(
             onPressed: () {
               final quantity =
@@ -332,7 +335,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
               }
               Get.back();
             },
-            child: const Text('Save'),
+            child: Text('save'.tr),
           ),
         ],
       ),
@@ -341,7 +344,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
 
   Future<void> _savePurchase() async {
     if (cartController.items.isEmpty) {
-      Get.snackbar('Missing items', 'Pick at least one product first.');
+      Get.snackbar('missing_items'.tr, 'pick_at_least_one_product'.tr);
       return;
     }
 
@@ -488,7 +491,7 @@ class _PurchaseItemsEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'No products selected yet.',
+            'no_products_selected_yet'.tr,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w800,
             ),
@@ -497,7 +500,7 @@ class _PurchaseItemsEmptyState extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onAdd,
             icon: const Icon(LucideIcons.plus, size: 16),
-            label: const Text('Add Products'),
+            label: Text('add_products'.tr),
           ),
         ],
       ),
@@ -580,7 +583,7 @@ class _PurchaseItemCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _PurchaseIconButton(
-                tooltip: 'Edit item',
+                tooltip: 'edit_item'.tr,
                 icon: LucideIcons.pencil,
                 color: theme.colorScheme.primary,
                 backgroundColor: theme.colorScheme.primary.withValues(
@@ -590,7 +593,7 @@ class _PurchaseItemCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               _PurchaseIconButton(
-                tooltip: 'Remove item',
+                tooltip: 'remove_item'.tr,
                 icon: LucideIcons.trash2,
                 color: Colors.red,
                 backgroundColor: Colors.red.withValues(alpha: 0.08),
@@ -613,7 +616,7 @@ class _PurchaseItemCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        tooltip: 'Reduce quantity',
+                        tooltip: 'reduce_quantity'.tr,
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
                         onPressed: onDecrease,
@@ -630,7 +633,7 @@ class _PurchaseItemCard extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Add quantity',
+                        tooltip: 'add_quantity'.tr,
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
                         onPressed: onIncrease,
@@ -673,14 +676,14 @@ class _PurchaseItemCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _PurchaseLineMetric(
-                  label: 'Cost',
+                  label: 'cost'.tr,
                   value: 'MMK ${currencyFormat.format(item.costPrice)}',
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _PurchaseLineMetric(
-                  label: 'Sell',
+                  label: 'sell'.tr,
                   value: 'MMK ${currencyFormat.format(sellPrice)}',
                 ),
               ),

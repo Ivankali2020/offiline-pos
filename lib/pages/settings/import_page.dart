@@ -30,7 +30,7 @@ const _typeConfigs = <_TypeConfig>[
     type: ImportType.products,
     icon: LucideIcons.package,
     color: Color(0xFF2563EB),
-    title: 'Products',
+    title: 'products',
     subtitle:
         'name, sku, sell_price, buy_price, stock_quantity, category_name, brand_name, is_active',
   ),
@@ -38,28 +38,28 @@ const _typeConfigs = <_TypeConfig>[
     type: ImportType.categories,
     icon: LucideIcons.layoutGrid,
     color: Color(0xFF7C3AED),
-    title: 'Categories',
+    title: 'categories',
     subtitle: 'name, description, is_sub_category (0 or 1)',
   ),
   _TypeConfig(
     type: ImportType.brands,
     icon: LucideIcons.tag,
     color: Color(0xFF0F766E),
-    title: 'Brands',
+    title: 'brands',
     subtitle: 'name, description',
   ),
   _TypeConfig(
     type: ImportType.expenseCategories,
     icon: LucideIcons.folderOpen,
     color: Color(0xFFD97706),
-    title: 'Expense Categories',
+    title: 'expense_categories',
     subtitle: 'name, icon',
   ),
   _TypeConfig(
     type: ImportType.expenses,
     icon: LucideIcons.receiptText,
     color: Color(0xFFDC2626),
-    title: 'Expenses',
+    title: 'expenses',
     subtitle:
         'category_name, amount, description, payment_method, date (YYYY-MM-DD)',
   ),
@@ -76,11 +76,11 @@ class ImportPage extends StatelessWidget {
     final controller = Get.put(ImportController());
 
     return AppScaffold(
-      title: 'Import Data',
+      title: 'import_data'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
-      appBar: const CustomAppBar(
-        title: 'Import Data',
-        subtitle: 'Bulk-import your data from CSV files.',
+      appBar: CustomAppBar(
+        title: 'import_data'.tr,
+        subtitle: 'import_data_subtitle'.tr,
       ),
       body: Obx(() {
         return Stack(
@@ -106,13 +106,12 @@ class ImportPage extends StatelessWidget {
                     const SizedBox(height: 20),
                   ],
                   _SectionHeader(
-                    title: 'Import History',
-                    subtitle:
-                        'Recent CSV import operations and row-level results.',
+                    title: 'import_history'.tr,
+                    subtitle: 'import_history_subtitle_csv'.tr,
                   ),
                   const SizedBox(height: 10),
                   if (controller.history.isEmpty)
-                    const _EmptyCard(message: 'No imports yet.')
+                    _EmptyCard(message: 'no_imports_yet'.tr)
                   else
                     ...controller.history.asMap().entries.map((entry) {
                       return Padding(
@@ -178,7 +177,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'Bulk Import',
+            'bulk_import'.tr,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w900,
@@ -186,8 +185,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Download a sample CSV, fill in your data, then import it here.\n'
-            'Products are updated if a matching name or SKU already exists.',
+            'bulk_import_subtitle'.tr,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.80),
               height: 1.4,
@@ -241,7 +239,7 @@ class _ImportCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  config.title,
+                  config.title.tr,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -262,7 +260,7 @@ class _ImportCard extends StatelessWidget {
                     Expanded(
                       child: _SmallButton(
                         icon: LucideIcons.share2,
-                        label: 'Share',
+                        label: 'share'.tr,
                         color: config.color,
                         outlined: true,
                         onPressed: controller.isBusy.value
@@ -275,7 +273,7 @@ class _ImportCard extends StatelessWidget {
                     Expanded(
                       child: _SmallButton(
                         icon: LucideIcons.folderDown,
-                        label: 'Download',
+                        label: 'download'.tr,
                         color: const Color(0xFF0F766E),
                         outlined: true,
                         onPressed: controller.isBusy.value
@@ -288,7 +286,7 @@ class _ImportCard extends StatelessWidget {
                     Expanded(
                       child: _SmallButton(
                         icon: LucideIcons.upload,
-                        label: 'Import',
+                        label: 'import_caps'.tr,
                         color: config.color,
                         outlined: false,
                         onPressed: controller.isBusy.value
@@ -339,7 +337,7 @@ class _ResultCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isOk ? 'Import Complete' : 'Import Finished with Issues',
+                isOk ? 'import_complete'.tr : 'import_finished_with_issues'.tr,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: accent,
@@ -348,10 +346,10 @@ class _ResultCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          _statRow('Type', log.importType),
-          _statRow('Total rows', '${log.totalRows}'),
-          _statRow('Successful', '${log.successfulRows}'),
-          if (log.failedRows > 0) _statRow('Failed / Skipped', '${log.failedRows}'),
+          _statRow('type'.tr, log.importType),
+          _statRow('total_rows'.tr, '${log.totalRows}'),
+          _statRow('successful'.tr, '${log.successfulRows}'),
+          if (log.failedRows > 0) _statRow('failed_skipped'.tr, '${log.failedRows}'),
           if (log.errorMessage != null && log.errorMessage!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
@@ -631,8 +629,8 @@ class _HistoryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${log.successfulRows} / ${log.totalRows} rows ok'
-                  '${log.failedRows > 0 ? '  •  ${log.failedRows} skipped' : ''}',
+                  '${log.successfulRows} / ${log.totalRows} ${'rows_ok'.tr}'
+                  '${log.failedRows > 0 ? '  •  ${log.failedRows} ${'skipped'.tr}' : ''}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.grey.shade700,
                   ),
@@ -661,7 +659,7 @@ class _HistoryTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              isOk ? 'done' : 'issues',
+              isOk ? 'done'.tr : 'issues'.tr,
               style: TextStyle(
                 color: statusColor,
                 fontWeight: FontWeight.w700,

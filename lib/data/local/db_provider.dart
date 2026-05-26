@@ -7,7 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'db_seed.dart';
+import 'db_seed_orders.dart';
 import 'pos_schema.dart';
+import 'db_products.dart';
 
 class DBProvider {
   DBProvider._();
@@ -118,7 +120,9 @@ class DBProvider {
     await close();
 
     final baseDirectory = targetDirectoryOverride == null
-        ? Directory(join((await getApplicationDocumentsDirectory()).path, 'backups'))
+        ? Directory(
+            join((await getApplicationDocumentsDirectory()).path, 'backups'),
+          )
         : Directory(targetDirectoryOverride);
     await baseDirectory.create(recursive: true);
 
@@ -127,10 +131,7 @@ class DBProvider {
     await sourceFile.copy(backupPath);
 
     await _openDatabaseAtPath(sourcePath, includeDevData: true);
-    await _logExport(
-      filePath: backupPath,
-      exporter: exporter,
-    );
+    await _logExport(filePath: backupPath, exporter: exporter);
     return backupPath;
   }
 
@@ -215,11 +216,14 @@ class DBProvider {
       'suppliers': DBSeed.suppliers,
       'attributes': DBSeed.attributes,
       'attribute_values': DBSeed.attributeValues,
-      'products': DBSeed.products,
+      'products': DbProducts.products,
+      'product_attribute_values': DBSeed.productAttributeValues,
       'expanse_categories': DBSeed.expenseCategoriesSeed,
       'expanses': DBSeed.expensesSeed,
       'purchases': DBSeed.purchasesSeed,
       'purchase_products': DBSeed.purchaseProductsSeed,
+      'orders': DBSeedOrders.orders,
+      'order_products': DBSeedOrders.orderProducts,
     };
 
     for (var entry in tables.entries) {

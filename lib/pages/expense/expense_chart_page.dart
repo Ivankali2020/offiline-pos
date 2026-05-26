@@ -31,10 +31,10 @@ class _ExpenseChartPageState extends State<ExpenseChartPage> {
     final theme = Theme.of(context);
 
     return AppScaffold(
-      title: 'Expense Charts',
-      appBar: const CustomAppBar(
-        title: 'Expense Charts',
-        subtitle: 'Review trends over time and category distribution.',
+      title: 'expense_charts'.tr,
+      appBar: CustomAppBar(
+        title: 'expense_charts'.tr,
+        subtitle: 'expense_charts_subtitle'.tr,
       ),
       body: Obx(() {
         final expenses = controller.expenses.toList(growable: false);
@@ -72,14 +72,14 @@ class _ExpenseChartPageState extends State<ExpenseChartPage> {
             children: [
               _ExpenseChartsHero(
                 title: _trendMode == _ExpenseTrendMode.monthly
-                    ? 'Monthly Trend'
-                    : 'Yearly Trend',
+                    ? 'monthly_trend'.tr
+                    : 'yearly_trend'.tr,
                 subtitle: _trendMode == _ExpenseTrendMode.monthly
-                    ? 'Tracking ${_selectedYear ?? ''} expense movement month by month.'
-                    : 'Comparing expense totals across all available years.',
+                    ? 'monthly_trend_subtitle'.tr.replaceAll('@year', '${_selectedYear ?? ''}')
+                    : 'yearly_trend_subtitle'.tr,
                 totalLabel: _trendMode == _ExpenseTrendMode.monthly
-                    ? 'Year Total'
-                    : 'Trend Total',
+                    ? 'year_total'.tr
+                    : 'trend_total'.tr,
                 totalValue: 'MMK ${_currencyFormat.format(trendTotal)}',
                 accentColor: const Color(0xFFB91C1C),
               ),
@@ -88,16 +88,16 @@ class _ExpenseChartPageState extends State<ExpenseChartPage> {
                 children: [
                   Expanded(
                     child: SegmentedButton<_ExpenseTrendMode>(
-                      segments: const [
+                      segments: [
                         ButtonSegment<_ExpenseTrendMode>(
                           value: _ExpenseTrendMode.monthly,
-                          icon: Icon(LucideIcons.chartSpline),
-                          label: Text('Monthly'),
+                          icon: const Icon(LucideIcons.chartSpline),
+                          label: Text('monthly'.tr),
                         ),
                         ButtonSegment<_ExpenseTrendMode>(
                           value: _ExpenseTrendMode.yearly,
-                          icon: Icon(LucideIcons.chartColumnIncreasing),
-                          label: Text('Yearly'),
+                          icon: const Icon(LucideIcons.chartColumnIncreasing),
+                          label: Text('yearly'.tr),
                         ),
                       ],
                       selected: {_trendMode},
@@ -116,9 +116,9 @@ class _ExpenseChartPageState extends State<ExpenseChartPage> {
                 children: [
                   Expanded(
                     child: _SectionLabel(
-                      title: 'Category Breakdown',
+                      title: 'category_breakdown'.tr,
                       subtitle:
-                          'Pie chart for ${_selectedYear ?? ''} expense categories',
+                          'pie_chart_subtitle'.tr.replaceAll('@year', '${_selectedYear ?? ''}'),
                     ),
                   ),
                   if (availableYears.isNotEmpty)
@@ -237,7 +237,7 @@ class _ExpenseChartPageState extends State<ExpenseChartPage> {
       if (date == null || date.year != year) continue;
       final label = (expense.categoryName?.trim().isNotEmpty ?? false)
           ? expense.categoryName!.trim()
-          : 'Uncategorized';
+          : 'uncategorized'.tr;
       totals.update(
         label,
         (value) => value + expense.amount,
@@ -442,8 +442,8 @@ class _TrendCard extends StatelessWidget {
                     ? LucideIcons.chartSpline
                     : LucideIcons.chartColumnIncreasing,
                 label: mode == _ExpenseTrendMode.monthly
-                    ? 'Monthly line chart'
-                    : 'Yearly line chart',
+                    ? 'monthly_line_chart'.tr
+                    : 'yearly_line_chart'.tr,
               ),
               _InfoChip(
                 icon: LucideIcons.banknote,
@@ -453,7 +453,7 @@ class _TrendCard extends StatelessWidget {
                 _InfoChip(
                   icon: LucideIcons.sparkles,
                   label:
-                      'Peak ${peak.label}: ${currencyFormat.format(peak.amount)}',
+                      'peak_label'.tr.replaceAll('@label', peak.label).replaceAll('@amount', currencyFormat.format(peak.amount)),
                 ),
               if (selectedPoint != null)
                 _InfoChip(
@@ -472,12 +472,12 @@ class _TrendCard extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(LucideIcons.chartNoAxesCombined, size: 28),
                   SizedBox(height: 10),
                   Text(
-                    'No expense trend data in this range.',
+                    'no_expense_trend_data'.tr,
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -574,14 +574,14 @@ class _CategoryPieCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Category Pie - ${year ?? ''}',
+            'category_pie_year'.tr.replaceAll('@year', '${year ?? ''}'),
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 4),
           Text(
-            'See which expense categories carry the most weight for the selected year.',
+            'category_pie_subtitle'.tr,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey.shade600,
               height: 1.35,
@@ -596,12 +596,12 @@ class _CategoryPieCard extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(LucideIcons.pieChart, size: 28),
                   SizedBox(height: 10),
                   Text(
-                    'No category data for this year.',
+                    'no_category_data'.tr,
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -619,7 +619,7 @@ class _CategoryPieCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Year Total',
+                            'year_total'.tr,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Colors.grey.shade600),
                           ),
@@ -715,14 +715,14 @@ class _EmptyChartsState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No expense data yet',
+              'no_expense_data'.tr,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Add a few expense records and this page will start showing trend and category charts.',
+              'add_expense_to_see_charts'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.textTheme.bodyMedium?.color?.withValues(
@@ -735,7 +735,7 @@ class _EmptyChartsState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRefresh,
               icon: const Icon(LucideIcons.refreshCcw, size: 16),
-              label: const Text('Refresh'),
+              label: Text('refresh'.tr),
             ),
           ],
         ),

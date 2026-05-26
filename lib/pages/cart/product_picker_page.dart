@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:abpos/controllers/product_controller.dart';
 import 'package:abpos/controllers/cart_controller.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
+import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/barcode_scanner_button.dart';
 import 'package:abpos/models/product.dart';
 
@@ -45,17 +46,19 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
     return AppScaffold(
       title: 'select_products'.tr,
       includeDrawer: false,
-      // backgroundColor: pageBackground,
-      actions: [
-        BarcodeScannerButton(
-          onScan: (code) {
-            setState(() {
-              _searchController.text = code;
-            });
-            Get.snackbar('scanned'.tr, code);
-          },
-        ),
-      ],
+      appBar: CustomAppBar(
+        title: 'select_products'.tr,
+        actions: [
+          BarcodeScannerButton(
+            onScan: (code) {
+              setState(() {
+                _searchController.text = code;
+              });
+              Get.snackbar('scanned'.tr, code);
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -88,7 +91,7 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
                     children: [
                       Expanded(
                         child: _PickerMiniStat(
-                          title: 'Results',
+                          title: 'results'.tr,
                           value: '${controller.filteredProducts.length}',
                           icon: Icons.grid_view_rounded,
                         ),
@@ -97,7 +100,7 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
                       Expanded(
                         child: Obx(
                           () => _PickerMiniStat(
-                            title: 'Cart Items',
+                            title: 'cart_items'.tr,
                             value: '${cartController.totalQuantity}',
                             icon: Icons.shopping_bag_outlined,
                           ),
@@ -248,7 +251,7 @@ class _PickerProductCard extends StatelessWidget {
                     color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -258,7 +261,7 @@ class _PickerProductCard extends StatelessWidget {
                       ),
                       SizedBox(width: 6),
                       Text(
-                        'Add',
+                        'add'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -287,7 +290,7 @@ class _PickerProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'Stock: ${product.stockQuantity}',
+        'stock_qty'.tr.replaceAll('@qty', '${product.stockQuantity}'),
         style: TextStyle(
           color: color,
           fontSize: 9,

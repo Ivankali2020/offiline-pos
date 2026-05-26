@@ -1,9 +1,10 @@
+import 'dart:convert';
 class OrderProduct {
   final int? id;
   final int orderId;
   final int productId;
   final int? variantId;
-  final String? attributes;
+  final List<dynamic>? attributes;
   final double price;
   final double discountPrice;
   final double discount;
@@ -46,7 +47,7 @@ class OrderProduct {
       orderId: map['order_id'] as int,
       productId: map['product_id'] as int,
       variantId: map['variant_id'] as int?,
-      attributes: map['attributes'] as String?,
+      attributes: _parseAttributes(map['attributes']),
       price: (map['price'] as num).toDouble(),
       discountPrice: (map['discount_price'] as num).toDouble(),
       discount: (map['discount'] as num).toDouble(),
@@ -68,7 +69,7 @@ class OrderProduct {
       'order_id': orderId,
       'product_id': productId,
       'variant_id': variantId,
-      'attributes': attributes,
+      'attributes': attributes != null ? jsonEncode(attributes) : null,
       'price': price,
       'discount_price': discountPrice,
       'discount': discount,
@@ -80,5 +81,19 @@ class OrderProduct {
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
+  }
+
+  static List<dynamic>? _parseAttributes(Object? value) {
+    if (value == null) return null;
+    if (value is String) {
+      if (value.trim().isEmpty) return null;
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is List) return decoded;
+      } catch (_) {}
+    } else if (value is List) {
+      return value;
+    }
+    return null;
   }
 }

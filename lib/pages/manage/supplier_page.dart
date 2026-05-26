@@ -32,17 +32,17 @@ class _SupplierPageState extends State<SupplierPage> {
     final bool isPicker = Get.arguments?['isPicker'] ?? false;
 
     return AppScaffold(
-      title: 'Suppliers',
+      title: 'suppliers'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: CustomAppBar(
-        title: 'Suppliers',
-        subtitle: 'Manage supplier contact records for purchases.',
+        title: 'suppliers'.tr,
+        subtitle: 'manage_suppliers_subtitle'.tr,
         leadingIcon: isPicker ? LucideIcons.chevronLeft : LucideIcons.menu,
         onBackPressed: isPicker ? () => Get.back() : null,
         titleWidget: _showSearch
             ? _SearchField(
                 controller: _searchController,
-                hintText: 'Search suppliers',
+                hintText: 'search_suppliers'.tr,
                 onChanged: (value) => controller.searchQuery.value = value,
                 onClear: () {
                   _searchController.clear();
@@ -115,7 +115,7 @@ class _SupplierPageState extends State<SupplierPage> {
                   child: _SupplierCard(
                     supplier: supplier,
                     dateFormat: _dateFormat,
-                    pickerLabel: isPicker ? 'Tap to select' : null,
+                    pickerLabel: isPicker ? 'tap_to_select'.tr : null,
                     onTap: isPicker ? () => Get.back(result: supplier) : null,
                     onEdit: () =>
                         _showSupplierSheet(context, supplier: supplier),
@@ -130,7 +130,7 @@ class _SupplierPageState extends State<SupplierPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showSupplierSheet(context),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Add Supplier'),
+        label: Text('add_supplier'.tr),
       ),
     );
   }
@@ -146,18 +146,18 @@ class _SupplierPageState extends State<SupplierPage> {
     Get.bottomSheet(
       isScrollControlled: true,
       _SupplierSheet(
-        title: supplier == null ? 'Add Supplier' : 'Edit Supplier',
-        subtitle: 'Keep supplier name, phone, email, and notes up to date.',
+        title: supplier == null ? 'add_supplier'.tr : 'edit_supplier'.tr,
+        subtitle: 'supplier_sheet_subtitle'.tr,
         child: Form(
           key: formKey,
           child: Column(
             children: [
               CustomTextField(
                 controller: nameController,
-                label: 'Name',
+                label: 'name'.tr,
                 isRequired: true,
                 validator: (value) => value == null || value.trim().isEmpty
-                    ? 'Name is required.'
+                    ? 'name_required'.tr
                     : null,
               ),
               const SizedBox(height: 14),
@@ -166,7 +166,7 @@ class _SupplierPageState extends State<SupplierPage> {
                   Expanded(
                     child: CustomTextField(
                       controller: phoneController,
-                      label: 'Phone',
+                      label: 'phone'.tr,
                       keyboardType: TextInputType.phone,
                     ),
                   ),
@@ -174,7 +174,7 @@ class _SupplierPageState extends State<SupplierPage> {
                   Expanded(
                     child: CustomTextField(
                       controller: emailController,
-                      label: 'Email',
+                      label: 'email'.tr,
                       keyboardType: TextInputType.emailAddress,
                     ),
                   ),
@@ -183,7 +183,7 @@ class _SupplierPageState extends State<SupplierPage> {
               const SizedBox(height: 14),
               CustomTextField(
                 controller: addressController,
-                label: 'Address / About',
+                label: 'address_about'.tr,
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
@@ -192,7 +192,7 @@ class _SupplierPageState extends State<SupplierPage> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
+                      child: Text('cancel'.tr),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -218,7 +218,7 @@ class _SupplierPageState extends State<SupplierPage> {
                         }
                         Get.back();
                       },
-                      child: const Text('Save'),
+                      child: Text('save'.tr),
                     ),
                   ),
                 ],
@@ -237,19 +237,19 @@ class _SupplierPageState extends State<SupplierPage> {
 
     Get.bottomSheet(
       _SupplierSheet(
-        title: 'Delete Supplier',
-        subtitle: 'This supplier record will be removed from local storage.',
+        title: 'delete_supplier'.tr,
+        subtitle: 'delete_supplier_subtitle'.tr,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Delete "${supplier.name}"?'),
+            Text('delete_confirm_name'.tr.replaceAll('@name', supplier.name)),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -263,7 +263,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Delete'),
+                    child: Text('delete'.tr),
                   ),
                 ),
               ],
@@ -324,7 +324,7 @@ class _SupplierOverviewCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Supplier Overview',
+            'supplier_overview'.tr,
             style: theme.textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w900,
@@ -332,7 +332,7 @@ class _SupplierOverviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '$visibleCount suppliers in view',
+            'suppliers_in_view'.tr.replaceAll('@count', '$visibleCount'),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.84),
             ),
@@ -342,21 +342,21 @@ class _SupplierOverviewCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _SupplierOverviewTile(
-                  label: 'Total',
+                  label: 'total'.tr,
                   value: '$totalCount',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _SupplierOverviewTile(
-                  label: 'With Phone',
+                  label: 'with_phone'.tr,
                   value: '$phoneCount',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _SupplierOverviewTile(
-                  label: 'With Email',
+                  label: 'with_email'.tr,
                   value: '$emailCount',
                 ),
               ),
@@ -435,8 +435,8 @@ class _SupplierCard extends StatelessWidget {
         ? null
         : DateTime.tryParse(supplier.updatedAt!);
     final updatedLabel = updatedAt == null
-        ? 'No recent update'
-        : 'Updated ${dateFormat.format(updatedAt)}';
+        ? 'no_recent_update'.tr
+        : 'updated_at_date'.tr.replaceAll('@date', dateFormat.format(updatedAt));
 
     return Material(
       color: Colors.transparent,
@@ -504,7 +504,7 @@ class _SupplierCard extends StatelessWidget {
                     ),
                   ),
                   _ActionIconButton(
-                    tooltip: 'Edit supplier',
+                    tooltip: 'edit_supplier_tooltip'.tr,
                     icon: LucideIcons.pencil,
                     color: theme.colorScheme.primary,
                     backgroundColor: theme.colorScheme.primary.withValues(
@@ -514,7 +514,7 @@ class _SupplierCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   _ActionIconButton(
-                    tooltip: 'Delete supplier',
+                    tooltip: 'delete_supplier_tooltip'.tr,
                     icon: LucideIcons.trash2,
                     color: Colors.red,
                     backgroundColor: Colors.red.withValues(alpha: 0.08),
@@ -678,7 +678,7 @@ class _EmptySuppliers extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              isSearching ? 'No suppliers found.' : 'No suppliers yet.',
+              isSearching ? 'no_suppliers_found'.tr : 'no_suppliers_yet'.tr,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -686,8 +686,8 @@ class _EmptySuppliers extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               isSearching
-                  ? 'Try another name, phone, or email to find the supplier you need.'
-                  : 'Start a supplier list so purchase records and stock receipts stay clean.',
+                  ? 'search_supplier_empty_subtitle'.tr
+                  : 'suppliers_empty_subtitle'.tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.textTheme.bodyMedium?.color?.withValues(
@@ -700,13 +700,13 @@ class _EmptySuppliers extends StatelessWidget {
             if (isSearching)
               OutlinedButton(
                 onPressed: onCreate,
-                child: const Text('Add Supplier'),
+                child: Text('add_supplier'.tr),
               )
             else
               ElevatedButton.icon(
                 onPressed: onCreate,
                 icon: const Icon(LucideIcons.plus, size: 16),
-                label: const Text('Add Supplier'),
+                label: Text('add_supplier'.tr),
               ),
           ],
         ),

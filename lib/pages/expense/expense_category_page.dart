@@ -28,15 +28,15 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
     final controller = Get.find<ExpenseCategoryController>();
 
     return AppScaffold(
-      title: 'Expense Categories',
+      title: 'expense_categories'.tr,
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: CustomAppBar(
-        title: 'Expense Categories',
-        subtitle: 'Organize recurring costs before recording expenses.',
+        title: 'expense_categories'.tr,
+        subtitle: 'expense_categories_subtitle'.tr,
         titleWidget: _showSearch
             ? _SearchField(
                 controller: _searchController,
-                hintText: 'Search expense categories',
+                hintText: 'search_expense_categories'.tr,
                 onChanged: (value) => controller.searchQuery.value = value,
                 onClear: () {
                   _searchController.clear();
@@ -66,8 +66,8 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
         final categories = controller.filteredCategories;
         if (categories.isEmpty) {
           return _EmptyState(
-            title: 'No expense categories yet',
-            subtitle: 'Create a category like Rent, Delivery, or Utilities.',
+            title: 'no_expense_categories'.tr,
+            subtitle: 'expense_categories_empty_subtitle'.tr,
           );
         }
 
@@ -108,15 +108,15 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
       isScrollControlled: true,
       _SheetScaffold(
         title: category == null
-            ? 'Add Expense Category'
-            : 'Edit Expense Category',
-        subtitle: 'Keep labels short so they work well in lists and reports.',
+            ? 'add_expense_category'.tr
+            : 'edit_expense_category'.tr,
+        subtitle: 'expense_category_sheet_subtitle'.tr,
         child: Column(
           children: [
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                labelText: 'Category Name',
+                labelText: 'category_name'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -126,8 +126,8 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
             TextField(
               controller: iconController,
               decoration: InputDecoration(
-                labelText: 'Icon Text (optional)',
-                hintText: 'For example: Rent or Gas',
+                labelText: 'icon_text_optional'.tr,
+                hintText: 'icon_text_hint'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -139,7 +139,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -164,7 +164,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                           : controller.updateCategory(nextCategory));
                       Get.back();
                     },
-                    child: const Text('Save'),
+                    child: Text('save'.tr),
                   ),
                 ),
               ],
@@ -182,19 +182,19 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
 
     Get.bottomSheet(
       _SheetScaffold(
-        title: 'Delete Expense Category',
-        subtitle: 'This category must not be used by any saved expense.',
+        title: 'delete_expense_category'.tr,
+        subtitle: 'delete_expense_category_subtitle'.tr,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Delete "${category.name}"?'),
+            Text('delete_confirm_name'.tr.replaceAll('@name', category.name)),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Cancel'),
+                    child: Text('cancel'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -207,8 +207,8 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                       } catch (_) {
                         Get.back();
                         Get.snackbar(
-                          'Unable to delete',
-                          'Remove expenses in this category first.',
+                          'unable_to_delete'.tr,
+                          'remove_expenses_first'.tr,
                         );
                       }
                     },
@@ -216,7 +216,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Delete'),
+                    child: Text('delete'.tr),
                   ),
                 ),
               ],
@@ -348,8 +348,8 @@ class _CategoryCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   hasLabel
-                      ? 'Icon label: $label'
-                      : 'Used to group expense records.',
+                      ? 'icon_label_is'.tr.replaceAll('@label', label!)
+                      : 'used_to_group_expenses'.tr,
                   style: TextStyle(color: Colors.grey.shade600, height: 1.35),
                 ),
               ],
