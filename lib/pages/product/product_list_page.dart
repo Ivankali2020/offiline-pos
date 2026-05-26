@@ -514,7 +514,7 @@ class _ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'stock'.tr + ': ${product.stockQuantity}',
+        '${'stock'.tr}: ${product.stockQuantity}',
         style: TextStyle(
           color: color,
           fontSize: 9,

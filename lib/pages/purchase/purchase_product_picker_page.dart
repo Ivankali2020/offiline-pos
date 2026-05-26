@@ -413,7 +413,7 @@ class _PickerCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'stock'.tr + ' ${product.stockQuantity}',
+                  '${'stock'.tr} ${product.stockQuantity}',
                   style: const TextStyle(
                     color: Color(0xFF0F766E),
                     fontSize: 10,
@@ -440,7 +440,7 @@ class _PickerCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'buy'.tr + ' MMK ${product.buyPrice.toStringAsFixed(0)}',
+                '${'buy'.tr} MMK ${product.buyPrice.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: Color(0xFF0F766E),
                   fontWeight: FontWeight.bold,

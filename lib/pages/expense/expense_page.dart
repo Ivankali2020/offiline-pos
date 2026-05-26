@@ -270,11 +270,13 @@ class _ExpensePageState extends State<ExpensePage> {
                             lastDate: DateTime(2100),
                           );
                           if (pickedDate != null) {
+                            if (!context.mounted) return;
                             final pickedTime = await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.fromDateTime(selectedDate),
                             );
                             if (pickedTime != null) {
+                              if (!context.mounted) return;
                               setModalState(() {
                                 selectedDate = DateTime(
                                   pickedDate.year,

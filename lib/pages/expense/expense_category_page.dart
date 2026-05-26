@@ -348,7 +348,7 @@ class _CategoryCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   hasLabel
-                      ? 'icon_label_is'.tr.replaceAll('@label', label!)
+                      ? 'icon_label_is'.tr.replaceAll('@label', label)
                       : 'used_to_group_expenses'.tr,
                   style: TextStyle(color: Colors.grey.shade600, height: 1.35),
                 ),

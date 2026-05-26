@@ -379,7 +379,7 @@ class _PurchaseCard extends StatelessWidget {
                     _MetaPill(
                       icon: Icons.payments_outlined,
                       label:
-                          'paid'.tr + ' ${currencyFormat.format(purchase.paidAmount)}',
+                          '${'paid'.tr} ${currencyFormat.format(purchase.paidAmount)}',
                     ),
                     _MetaPill(
                       icon: Icons.schedule_rounded,

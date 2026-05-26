@@ -286,7 +286,7 @@ class _PurchaseCreatePageState extends State<PurchaseCreatePage> {
     );
     await Get.dialog(
       AlertDialog(
-        title: Text('edit'.tr + ' ${item.productName ?? 'purchase_items'.tr}'),
+        title: Text('${'edit'.tr} ${item.productName ?? 'purchase_items'.tr}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
