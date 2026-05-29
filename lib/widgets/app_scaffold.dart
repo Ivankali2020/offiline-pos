@@ -239,6 +239,11 @@ class _AppDrawer extends StatelessWidget {
             ),
             buildSectionLabel('system'.tr),
             buildItem(
+              'printers'.tr,
+              AppRoutes.printers,
+              LucideIcons.printer,
+            ),
+            buildItem(
               'backup_restore'.tr,
               AppRoutes.backup,
               Icons.backup_table_rounded,

@@ -12,6 +12,7 @@ import 'package:abpos/controllers/purchase_cart_controller.dart';
 import 'package:abpos/controllers/purchase_controller.dart';
 import 'package:abpos/controllers/settings_controller.dart';
 import 'package:abpos/controllers/supplier_controller.dart';
+import 'package:abpos/controllers/printer_controller.dart';
 import 'package:get/get.dart';
 
 class AppRefreshService {
@@ -57,6 +58,9 @@ class AppRefreshService {
     }
     if (Get.isRegistered<SettingsController>()) {
       futures.add(Get.find<SettingsController>().loadSettings());
+    }
+    if (Get.isRegistered<PrinterController>()) {
+      futures.add(Get.find<PrinterController>().loadPrinters());
     }
     if (Get.isRegistered<DashboardController>()) {
       final dashboard = Get.find<DashboardController>();

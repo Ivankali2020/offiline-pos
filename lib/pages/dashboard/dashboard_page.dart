@@ -534,6 +534,13 @@ class _QuickActionGrid extends StatelessWidget {
             () => Get.toNamed(AppRoutes.expenseCategories),
           ),
           _QuickActionData(
+            'printers'.tr,
+            'manage_printers_subtitle'.tr,
+            LucideIcons.printer,
+            const Color(0xFF6366F1),
+            () => Get.toNamed(AppRoutes.printers),
+          ),
+          _QuickActionData(
             'settings'.tr,
             'update_store_setup'.tr,
             LucideIcons.settings,

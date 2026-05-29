@@ -14,6 +14,7 @@ import 'package:abpos/controllers/purchase_controller.dart';
 import 'package:abpos/controllers/purchase_cart_controller.dart';
 import 'package:abpos/controllers/payment_controller.dart';
 import 'package:abpos/controllers/supplier_controller.dart';
+import 'package:abpos/controllers/printer_controller.dart';
 
 class AppBindings extends Bindings {
   static Future<void> initServices() async {
@@ -36,6 +37,7 @@ class AppBindings extends Bindings {
     Get.put(PurchaseCartController(), permanent: true);
     Get.put(PaymentController(), permanent: true);
     Get.put(SupplierController(), permanent: true);
+    Get.put(PrinterController(), permanent: true);
   }
 
   @override

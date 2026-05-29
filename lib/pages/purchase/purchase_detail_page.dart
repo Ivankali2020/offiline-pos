@@ -1,13 +1,19 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:abpos/controllers/purchase_controller.dart';
 import 'package:abpos/controllers/settings_controller.dart';
 import 'package:abpos/models/purchase.dart';
 import 'package:abpos/models/purchase_product.dart';
 import 'package:abpos/models/settings.dart';
+import 'package:abpos/services/receipt_printer_utils.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
+import 'package:abpos/widgets/thermal_receipt_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:screenshot/screenshot.dart';
 
 class PurchaseDetailPage extends StatefulWidget {
   const PurchaseDetailPage({super.key, required this.purchase});
@@ -22,6 +28,8 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
   final PurchaseController _controller = Get.find<PurchaseController>();
   final SettingsController _settingsController = Get.find<SettingsController>();
   final NumberFormat _currencyFormat = NumberFormat('#,##0', 'en_US');
+  final ScreenshotController _screenshotController = ScreenshotController();
+  bool _isPrinting = false;
 
   late Purchase _purchase;
   late Future<List<PurchaseProduct>> _itemsFuture;
@@ -44,6 +52,25 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
       appBar: CustomAppBar(
         title: 'purchase_receipt'.tr,
         subtitle: 'purchase_receipt_subtitle'.tr,
+        actions: [
+          IconButton(
+            onPressed: _isPrinting ? null : () => _printReceipt(context),
+            icon: _isPrinting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                : Icon(
+                    Icons.print_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
+            tooltip: 'print_receipt'.tr,
+          ),
+        ],
       ),
       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(
         alpha: 0.20,
@@ -327,6 +354,139 @@ class _PurchaseDetailPageState extends State<PurchaseDetailPage> {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) return raw;
     return DateFormat('dd MMM yyyy • hh:mm a').format(parsed);
+  }
+
+  // ─── Thermal Print Pipeline ─────────────────────────────────────────
+
+  Future<void> _printReceipt(BuildContext ctx) async {
+    if (_isPrinting) return;
+    setState(() => _isPrinting = true);
+
+    try {
+      final purchase = _purchase;
+      final settings = _settingsController.settings.value;
+      final items = await _itemsFuture;
+
+      final currencyCode =
+          _displayText(settings?.currencyCode, fallback: 'MMK');
+
+      // ── Build the receipt item list ──
+      final receiptItems = items.map((item) {
+        final title =
+            item.productName ?? 'Product #${item.productId}';
+        return ReceiptItem(
+          name: title,
+          variant: (item.variantName ?? '').trim().isEmpty
+              ? null
+              : item.variantName!.trim(),
+          quantity: item.quantity,
+          unitPrice: item.costPrice,
+          lineTotal: item.totalCost,
+        );
+      }).toList();
+
+      // ── Construct the print-only widget ──
+      // Purchase receipts reuse ThermalReceiptWidget but repurpose
+      // some fields: subtotal/delivery/tax become paid/due/-, and
+      // change/paidBy are hidden by passing empty strings.
+      final receiptWidget = ThermalReceiptWidget(
+        storeName: _displayText(settings?.storeName, fallback: 'AB POS'),
+        receiptHeader: _displayText(
+          settings?.receiptHeader,
+          fallback: 'purchase_receipt'.tr,
+        ),
+        receiptFooter: _displayText(
+          settings?.receiptFooter,
+          fallback: 'stock_intake_record_saved'.tr,
+        ),
+        receiptPhone: (settings?.receiptPhone ?? '').trim(),
+        receiptAddress: (settings?.receiptAddress ?? '').trim(),
+        currencyCode: currencyCode,
+        invoiceNumber: purchase.invoiceNumber,
+        status: purchase.status.toUpperCase(),
+        customerName: '',
+        customerPhone: '',
+        paymentName: '',
+        dateFormatted: _formatDate(purchase.createdAt),
+        items: receiptItems,
+        subTotal: _currencyFormat.format(purchase.totalAmount),
+        deliveryFees: _currencyFormat.format(purchase.paidAmount),
+        taxLabel: 'receipt_label_due'.tr,
+        taxPrice: _currencyFormat.format(purchase.dueAmount),
+        totalPrice: _currencyFormat.format(purchase.totalAmount),
+        givenAmount: _currencyFormat.format(purchase.paidAmount),
+        changeAmount: _currencyFormat.format(purchase.dueAmount),
+        note: purchase.note,
+        // Localized labels
+        labelInvoice: 'receipt_label_invoice'.tr,
+        labelStatus: 'receipt_label_status'.tr,
+        labelCustomer: 'receipt_label_customer'.tr,
+        labelPhone: 'receipt_label_phone'.tr,
+        labelItems: 'receipt_label_items'.tr,
+        labelNoItems: 'receipt_label_no_items'.tr,
+        labelSubtotal: 'receipt_label_total'.tr,
+        labelDelivery: 'receipt_label_paid'.tr,
+        labelTotal: 'receipt_label_total'.tr,
+        labelPaid: 'receipt_label_paid'.tr,
+        labelChange: 'receipt_label_due'.tr,
+        labelPaidBy: '',
+        labelNote: 'receipt_label_note'.tr,
+        labelThankYou: purchase.status.trim().toLowerCase() == 'completed'
+            ? 'stock_has_been_imported'.tr
+            : 'complete_this_receipt_to_import_stock'.tr,
+      );
+
+      // ── Capture to PNG ──
+      final Uint8List imageBytes =
+          await _screenshotController.captureFromLongWidget(
+        receiptWidget,
+        pixelRatio: 1.0,
+        delay: const Duration(milliseconds: 100),
+      );
+
+      if (imageBytes.isEmpty) {
+        throw Exception('Screenshot capture returned empty data');
+      }
+
+      // ── Compile ESC/POS payload ──
+      final payload = await compileReceiptPayload(imageBytes);
+
+      // ── Send over TCP to printer ──
+      const printerIp = '192.168.100.130';
+      const printerPort = 9100;
+
+      final socket = await Socket.connect(
+        printerIp,
+        printerPort,
+        timeout: const Duration(seconds: 5),
+      );
+      socket.add(payload);
+      await socket.flush();
+      await socket.close();
+
+      if (ctx.mounted) {
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          SnackBar(
+            content: Text('print_success'.tr),
+            backgroundColor: Colors.green.shade700,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Thermal print error: $e');
+      if (ctx.mounted) {
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          SnackBar(
+            content: Text('${'print_failed'.tr}: $e'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isPrinting = false);
+      }
+    }
   }
 }
 
