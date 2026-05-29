@@ -4,6 +4,7 @@ import 'package:abpos/models/attribute_value.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -155,29 +156,10 @@ class _AttributeFormPageState extends State<AttributeFormPage> {
               ),
             ),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _isSaving ? null : Get.back,
-                  child: Text('cancel'.tr),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: _isSaving ? null : _save,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(LucideIcons.save, size: 18),
-                  label: Text('save'.tr),
-                ),
-              ),
-            ],
+          child: FormActionButtons(
+            confirmIcon: LucideIcons.save,
+            isLoading: _isSaving,
+            onConfirm: _save,
           ),
         ),
       ),
@@ -648,22 +630,8 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
               }).toList(),
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Get.back(result: _selectedColor),
-                    child: Text('save'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              onConfirm: () => Get.back(result: _selectedColor),
             ),
           ],
         ),

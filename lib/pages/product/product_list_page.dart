@@ -6,6 +6,8 @@ import 'package:abpos/pages/product/product_filter_bottom_sheet.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:abpos/models/product.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -177,22 +179,28 @@ class _ProductListPageState extends State<ProductListPage> {
     ProductController controller,
     Product product,
   ) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('delete'.tr),
-        content: Text('delete_product_confirm'.tr.replaceAll('@name', product.name)),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
-          TextButton(
-            onPressed: () {
-              if (product.id != null) {
-                controller.deleteProduct(product.id!);
-              }
-              Get.back();
-            },
-            child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
+    final productId = product.id;
+    if (productId == null) return;
+
+    Get.bottomSheet(
+      CustomFormSheet(
+        title: 'delete_product'.tr,
+        subtitle: 'delete_product_subtitle'.tr,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('delete_confirm_name'.tr.replaceAll('@name', product.name)),
+            const SizedBox(height: 20),
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                await controller.deleteProduct(productId);
+                Get.back();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -348,6 +356,8 @@ class _ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     return Material(
       color: Colors.transparent,
@@ -439,20 +449,22 @@ class _ProductCard extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               LucideIcons.pencil,
                               size: 15,
                               color: Colors.white,
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              'edit'.tr,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 11,
+                            if (!isMobile) ...[
+                              const SizedBox(width: 6),
+                              Text(
+                                'edit'.tr,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ),
@@ -475,20 +487,22 @@ class _ProductCard extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               LucideIcons.trash2,
                               size: 15,
                               color: Colors.red,
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              'delete'.tr,
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 11,
+                            if (!isMobile) ...[
+                              const SizedBox(width: 6),
+                              Text(
+                                'delete'.tr,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ),

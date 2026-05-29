@@ -3,6 +3,8 @@ import 'package:abpos/models/supplier.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -145,7 +147,7 @@ class _SupplierPageState extends State<SupplierPage> {
 
     Get.bottomSheet(
       isScrollControlled: true,
-      _SupplierSheet(
+      CustomFormSheet(
         title: supplier == null ? 'add_supplier'.tr : 'edit_supplier'.tr,
         subtitle: 'supplier_sheet_subtitle'.tr,
         child: Form(
@@ -187,41 +189,27 @@ class _SupplierPageState extends State<SupplierPage> {
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!formKey.currentState!.validate()) return;
-                        final now = DateTime.now().toIso8601String();
-                        final nextSupplier = Supplier(
-                          id: supplier?.id,
-                          name: nameController.text.trim(),
-                          phone: _blankToNull(phoneController.text),
-                          email: _blankToNull(emailController.text),
-                          address: _blankToNull(addressController.text),
-                          createdAt: supplier?.createdAt ?? now,
-                          updatedAt: now,
-                        );
+              FormActionButtons(
+                onConfirm: () async {
+                  if (!formKey.currentState!.validate()) return;
+                  final now = DateTime.now().toIso8601String();
+                  final nextSupplier = Supplier(
+                    id: supplier?.id,
+                    name: nameController.text.trim(),
+                    phone: _blankToNull(phoneController.text),
+                    email: _blankToNull(emailController.text),
+                    address: _blankToNull(addressController.text),
+                    createdAt: supplier?.createdAt ?? now,
+                    updatedAt: now,
+                  );
 
-                        if (supplier == null) {
-                          await controller.addSupplier(nextSupplier);
-                        } else {
-                          await controller.updateSupplier(nextSupplier);
-                        }
-                        Get.back();
-                      },
-                      child: Text('save'.tr),
-                    ),
-                  ),
-                ],
+                  if (supplier == null) {
+                    await controller.addSupplier(nextSupplier);
+                  } else {
+                    await controller.updateSupplier(nextSupplier);
+                  }
+                  Get.back();
+                },
               ),
             ],
           ),
@@ -236,7 +224,7 @@ class _SupplierPageState extends State<SupplierPage> {
     if (supplierId == null) return;
 
     Get.bottomSheet(
-      _SupplierSheet(
+      CustomFormSheet(
         title: 'delete_supplier'.tr,
         subtitle: 'delete_supplier_subtitle'.tr,
         child: Column(
@@ -244,29 +232,13 @@ class _SupplierPageState extends State<SupplierPage> {
           children: [
             Text('delete_confirm_name'.tr.replaceAll('@name', supplier.name)),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.deleteSupplier(supplierId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                await controller.deleteSupplier(supplierId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -715,74 +687,7 @@ class _EmptySuppliers extends StatelessWidget {
   }
 }
 
-class _SupplierSheet extends StatelessWidget {
-  const _SupplierSheet({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: EdgeInsets.fromLTRB(
-          18,
-          12,
-          18,
-          MediaQuery.of(context).viewInsets.bottom + 18,
-        ),
-        decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: theme.dividerColor.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                title,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withValues(
-                    alpha: 0.72,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              child,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _SearchField extends StatelessWidget {
   const _SearchField({

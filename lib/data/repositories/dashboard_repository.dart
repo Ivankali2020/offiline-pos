@@ -45,7 +45,29 @@ class DashboardRepository {
   Future<double> totalExpenses() async {
     final db = await DBProvider.instance.database;
     final result = await db.rawQuery(
+      "SELECT IFNULL(SUM(amount), 0) AS total FROM expanses WHERE transaction_type = 'expense'",
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
+
+  Future<double> totalCapital() async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
       "SELECT IFNULL(SUM(amount), 0) AS total FROM expanses WHERE transaction_type = 'capital'",
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
+
+  Future<double> totalAllExpenses() async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
+      "SELECT IFNULL(SUM(amount), 0) AS total FROM expanses",
     );
     if (result.isEmpty || result.first['total'] == null) {
       return 0.0;

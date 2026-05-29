@@ -17,7 +17,7 @@ class AppShell extends StatelessWidget {
       getPages: AppPages.routes,
       initialBinding: AppBindings(),
       translations: AppTranslations(),
-      locale: const Locale('en', 'US'),
+      locale: const Locale('my', 'MM'),
       fallbackLocale: const Locale('en', 'US'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

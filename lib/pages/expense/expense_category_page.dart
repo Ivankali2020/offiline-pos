@@ -2,6 +2,9 @@ import 'package:abpos/controllers/expense_category_controller.dart';
 import 'package:abpos/models/expense_category.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
+import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -106,68 +109,44 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
 
     Get.bottomSheet(
       isScrollControlled: true,
-      _SheetScaffold(
+      CustomFormSheet(
         title: category == null
             ? 'add_expense_category'.tr
             : 'edit_expense_category'.tr,
         subtitle: 'expense_category_sheet_subtitle'.tr,
         child: Column(
           children: [
-            TextField(
+            CustomTextField(
               controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'category_name'.tr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+              label: 'category_name'.tr,
+              isRequired: true,
             ),
             const SizedBox(height: 14),
-            TextField(
+            CustomTextField(
               controller: iconController,
-              decoration: InputDecoration(
-                labelText: 'icon_text_optional'.tr,
-                hintText: 'icon_text_hint'.tr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+              label: 'icon_text_optional'.tr,
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (nameController.text.trim().isEmpty) return;
+            FormActionButtons(
+              onConfirm: () async {
+                if (nameController.text.trim().isEmpty) return;
 
-                      final now = DateTime.now().toIso8601String();
-                      final nextCategory = ExpenseCategory(
-                        id: category?.id,
-                        name: nameController.text.trim(),
-                        icon: iconController.text.trim().isEmpty
-                            ? null
-                            : iconController.text.trim(),
-                        createdAt: category?.createdAt ?? now,
-                        updatedAt: now,
-                      );
+                final now = DateTime.now().toIso8601String();
+                final nextCategory = ExpenseCategory(
+                  id: category?.id,
+                  name: nameController.text.trim(),
+                  icon: iconController.text.trim().isEmpty
+                      ? null
+                      : iconController.text.trim(),
+                  createdAt: category?.createdAt ?? now,
+                  updatedAt: now,
+                );
 
-                      await (category == null
-                          ? controller.addCategory(nextCategory)
-                          : controller.updateCategory(nextCategory));
-                      Get.back();
-                    },
-                    child: Text('save'.tr),
-                  ),
-                ),
-              ],
+                await (category == null
+                    ? controller.addCategory(nextCategory)
+                    : controller.updateCategory(nextCategory));
+                Get.back();
+              },
             ),
           ],
         ),
@@ -181,7 +160,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
     if (categoryId == null) return;
 
     Get.bottomSheet(
-      _SheetScaffold(
+      CustomFormSheet(
         title: 'delete_expense_category'.tr,
         subtitle: 'delete_expense_category_subtitle'.tr,
         child: Column(
@@ -189,37 +168,21 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
           children: [
             Text('delete_confirm_name'.tr.replaceAll('@name', category.name)),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await controller.deleteCategory(categoryId);
-                        Get.back();
-                      } catch (_) {
-                        Get.back();
-                        Get.snackbar(
-                          'unable_to_delete'.tr,
-                          'remove_expenses_first'.tr,
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                try {
+                  await controller.deleteCategory(categoryId);
+                  Get.back();
+                } catch (_) {
+                  Get.back();
+                  Get.snackbar(
+                    'unable_to_delete'.tr,
+                    'remove_expenses_first'.tr,
+                  );
+                }
+              },
             ),
           ],
         ),
@@ -370,67 +333,7 @@ class _CategoryCard extends StatelessWidget {
   }
 }
 
-class _SheetScaffold extends StatelessWidget {
-  const _SheetScaffold({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            12,
-            20,
-            MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 20),
-                child,
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.title, required this.subtitle});

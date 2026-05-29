@@ -301,14 +301,6 @@ class _CartInsightRow extends StatelessWidget {
       children: [
         Expanded(
           child: _CartMiniStat(
-            title: 'items'.tr,
-            value: '$totalItems',
-            icon: Icons.shopping_bag_outlined,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _CartMiniStat(
             title: 'subtotal'.tr,
             value: 'MMK ${currencyFormat.format(subTotal)}',
             icon: Icons.payments_outlined,

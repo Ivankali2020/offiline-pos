@@ -3,6 +3,8 @@ import 'package:abpos/models/attribute.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -113,7 +115,7 @@ class _AttributePageState extends State<AttributePage> {
     if (attributeId == null) return;
 
     Get.bottomSheet(
-      _ActionSheet(
+      CustomFormSheet(
         title: 'delete_attribute'.tr,
         subtitle: 'delete_attribute_subtitle'.tr,
         child: Column(
@@ -121,29 +123,13 @@ class _AttributePageState extends State<AttributePage> {
           children: [
             Text('delete_attribute_confirm'.trParams({'name': attribute.name})),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.deleteAttribute(attributeId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () {
+                controller.deleteAttribute(attributeId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -360,68 +346,4 @@ class _EmptyAttributes extends StatelessWidget {
   }
 }
 
-class _ActionSheet extends StatelessWidget {
-  const _ActionSheet({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: EdgeInsets.only(
-        left: 18,
-        right: 18,
-        top: 18,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 18,
-      ),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(LucideIcons.x),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.textTheme.bodyMedium?.color?.withValues(
-                  alpha: 0.72,
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -1,7 +1,7 @@
 import 'package:abpos/controllers/dashboard_controller.dart';
-import 'package:abpos/data/repositories/dashboard_repository.dart';
 import 'package:abpos/data/local/db_provider.dart';
 import 'package:abpos/pages/dashboard/dashboard_chart_filter_bottom_sheet.dart';
+import 'package:abpos/pages/dashboard/order_trend_chart.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/services/app_refresh_service.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
@@ -62,7 +62,7 @@ class DashboardPage extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Obx(
-              () => _OrderTrendCard(
+              () => OrderTrendChart(
                 points: controller.orderTrendPoints.toList(),
                 filterLabel: _filterLabel(controller),
               ),
@@ -237,7 +237,7 @@ class _OverviewGrid extends StatelessWidget {
             () => _StatCard(
               label: 'expenses'.tr,
               value: DashboardPage._numberFormat.format(
-                controller.totalExpenses.value,
+                controller.totalExpenses.value + controller.totalCapital.value,
               ),
               suffix: 'MMK',
               icon: Icons.receipt_long_rounded,
@@ -253,6 +253,17 @@ class _OverviewGrid extends StatelessWidget {
               suffix: 'MMK',
               icon: Icons.account_balance_wallet_rounded,
               color: const Color(0xFF0F766E),
+            ),
+          ),
+          Obx(
+            () => _StatCard(
+              label: 'profit_minus_expenses'.tr,
+              value: DashboardPage._numberFormat.format(
+                controller.profitMinusExpenses,
+              ),
+              suffix: 'MMK',
+              icon: LucideIcons.wallet,
+              color: const Color(0xFF0284C7),
             ),
           ),
           Obx(
@@ -432,100 +443,7 @@ class _FilterButton extends StatelessWidget {
   }
 }
 
-class _OrderTrendCard extends StatelessWidget {
-  const _OrderTrendCard({required this.points, required this.filterLabel});
 
-  final List<DashboardTrendPoint> points;
-  final String filterLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final totalSales = points.fold<double>(
-      0,
-      (sum, item) => sum + item.totalSales,
-    );
-    final totalOrders = points.fold<int>(
-      0,
-      (sum, item) => sum + item.orderCount,
-    );
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration(radius: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _InfoChip(icon: LucideIcons.calendarRange, label: filterLabel),
-              _InfoChip(
-                icon: LucideIcons.shoppingBag,
-                label: '$totalOrders ${'orders'.tr.toLowerCase()}',
-              ),
-              _InfoChip(
-                icon: LucideIcons.banknote,
-                label: '${DashboardPage._numberFormat.format(totalSales)} MMK',
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          if (points.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Column(
-                children: [
-                  Icon(LucideIcons.chartNoAxesCombined, size: 28),
-                  SizedBox(height: 10),
-                  Text(
-                    'no_order_trend'.tr,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            )
-          else ...[
-            SizedBox(
-              height: 210,
-              child: CustomPaint(
-                painter: _TrendLinePainter(
-                  points: points,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                child: Container(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    DateFormat('dd MMM').format(points.first.date),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                Text(
-                  DateFormat('dd MMM').format(points.last.date),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
 
 class _QuickActionGrid extends StatelessWidget {
   const _QuickActionGrid();
@@ -713,133 +631,9 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.label});
 
-  final IconData icon;
-  final String label;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: Colors.black54),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-class _TrendLinePainter extends CustomPainter {
-  const _TrendLinePainter({required this.points, required this.color});
-
-  final List<DashboardTrendPoint> points;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.length == 1) {
-      canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        4,
-        Paint()..color = color,
-      );
-      return;
-    }
-
-    const horizontalPadding = 8.0;
-    const verticalPadding = 16.0;
-    final chartWidth = size.width - horizontalPadding * 2;
-    final chartHeight = size.height - verticalPadding * 2;
-    final maxValue = points
-        .map((point) => point.totalSales)
-        .reduce((a, b) => a > b ? a : b);
-    final safeMax = maxValue <= 0 ? 1.0 : maxValue;
-
-    final gridPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
-      ..strokeWidth = 1;
-    for (var i = 0; i < 4; i++) {
-      final y = verticalPadding + chartHeight / 3 * i;
-      canvas.drawLine(
-        Offset(horizontalPadding, y),
-        Offset(size.width - horizontalPadding, y),
-        gridPaint,
-      );
-    }
-
-    final offsets = <Offset>[];
-    for (var i = 0; i < points.length; i++) {
-      final dx = horizontalPadding + chartWidth * (i / (points.length - 1));
-      final dy =
-          verticalPadding +
-          chartHeight -
-          chartHeight * (points[i].totalSales / safeMax);
-      offsets.add(Offset(dx, dy));
-    }
-
-    final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
-    for (var i = 1; i < offsets.length; i++) {
-      final previous = offsets[i - 1];
-      final current = offsets[i];
-      final controlX = (previous.dx + current.dx) / 2;
-      path.cubicTo(
-        controlX,
-        previous.dy,
-        controlX,
-        current.dy,
-        current.dx,
-        current.dy,
-      );
-    }
-
-    final fillPath = Path.from(path)
-      ..lineTo(offsets.last.dx, size.height - verticalPadding)
-      ..lineTo(offsets.first.dx, size.height - verticalPadding)
-      ..close();
-    canvas.drawPath(
-      fillPath,
-      Paint()
-        ..shader = LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.26),
-            color.withValues(alpha: 0.02),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color
-        ..strokeWidth = 3
-        ..style = PaintingStyle.stroke,
-    );
-
-    for (final offset in offsets) {
-      canvas.drawCircle(offset, 4.5, Paint()..color = color);
-      canvas.drawCircle(offset, 2.5, Paint()..color = Colors.white);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _TrendLinePainter oldDelegate) {
-    return oldDelegate.points != points || oldDelegate.color != color;
-  }
-}
 
 BoxDecoration _cardDecoration({double radius = 22, bool shadow = true}) {
   return BoxDecoration(

@@ -1,10 +1,14 @@
 import 'package:abpos/controllers/expense_category_controller.dart';
 import 'package:abpos/controllers/expense_controller.dart';
 import 'package:abpos/models/expense.dart';
+import 'package:abpos/models/expense_category.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_dropdown_field.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -52,6 +56,49 @@ class _ExpensePageState extends State<ExpensePage> {
               )
             : null,
         actions: [
+          // Filter button with badge
+          Obx(() {
+            final count = expenseController.activeFilterCount;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.slidersHorizontal,
+                    color: count > 0
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.primary,
+                  ),
+                  onPressed: () => _showFilterSheet(context, expenseController, categoryController),
+                  tooltip: 'filter'.tr,
+                ),
+                if (count > 0)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$count',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
+          // Search button
           IconButton(
             icon: Icon(
               _showSearch ? LucideIcons.x : LucideIcons.search,
@@ -75,6 +122,7 @@ class _ExpensePageState extends State<ExpensePage> {
         );
         final allExpenses = expenseController.expenses.toList(growable: false);
         final filteredExpenses = expenseController.filteredExpenses;
+        final activeFilters = expenseController.activeFilterCount;
 
         if (categories.isEmpty) {
           return _MissingCategoryState(
@@ -90,14 +138,22 @@ class _ExpensePageState extends State<ExpensePage> {
 
         return Column(
           children: [
-            _TransactionTypeFilterBar(controller: expenseController),
+            // Active filter chips
+            if (activeFilters > 0)
+              _ActiveFilterChips(
+                controller: expenseController,
+                categories: categories,
+                onClearAll: () {
+                  _searchController.clear();
+                  expenseController.clearAllFilters();
+                },
+              ),
             Expanded(
               child: filteredExpenses.isEmpty
                   ? _EmptySearchState(
                       onClear: () {
                         _searchController.clear();
-                        expenseController.searchQuery.value = '';
-                        expenseController.selectedTransactionType.value = null;
+                        expenseController.clearAllFilters();
                       },
                     )
                   : RefreshIndicator(
@@ -171,6 +227,223 @@ class _ExpensePageState extends State<ExpensePage> {
     );
   }
 
+  // ── FILTER SHEET ─────────────────────────────────────────────────────────────
+  void _showFilterSheet(
+    BuildContext context,
+    ExpenseController expenseController,
+    ExpenseCategoryController categoryController,
+  ) {
+    // Capture current values to track pending changes within the sheet
+    String? tempType = expenseController.selectedTransactionType.value;
+    String? tempDateLabel = expenseController.selectedDateRangeLabel.value;
+    int? tempCategoryId = expenseController.selectedCategoryId.value;
+    DateTime? tempCustomStart = expenseController.customDateStart.value;
+    DateTime? tempCustomEnd = expenseController.customDateEnd.value;
+
+    final categories = categoryController.categories.toList(growable: false);
+
+    Get.bottomSheet(
+      isScrollControlled: true,
+      StatefulBuilder(
+        builder: (context, setModalState) {
+          return CustomFormSheet(
+            title: 'filter'.tr,
+            subtitle: 'filter_expenses_subtitle'.tr,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Transaction Type ──────────────────────────────────────
+                Text(
+                  'transaction_type'.tr,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _SheetFilterChip(
+                      label: 'all'.tr,
+                      isSelected: tempType == null,
+                      onTap: () => setModalState(() => tempType = null),
+                    ),
+                    _SheetFilterChip(
+                      label: 'expense'.tr.capitalizeFirst ?? 'Expense',
+                      isSelected: tempType == 'expense',
+                      onTap: () => setModalState(() => tempType = 'expense'),
+                    ),
+                    _SheetFilterChip(
+                      label: 'capital'.tr,
+                      isSelected: tempType == 'capital',
+                      onTap: () => setModalState(() => tempType = 'capital'),
+                    ),
+                    _SheetFilterChip(
+                      label: 'drawing'.tr,
+                      isSelected: tempType == 'drawing',
+                      onTap: () => setModalState(() => tempType = 'drawing'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // ── Date Range ────────────────────────────────────────────
+                Text(
+                  'date_range_label'.tr,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _SheetFilterChip(
+                      label: 'all_time'.tr,
+                      isSelected: tempDateLabel == null,
+                      onTap: () => setModalState(() {
+                        tempDateLabel = null;
+                        tempCustomStart = null;
+                        tempCustomEnd = null;
+                      }),
+                    ),
+                    _SheetFilterChip(
+                      label: 'this_month'.tr,
+                      isSelected: tempDateLabel == 'this_month',
+                      onTap: () => setModalState(() {
+                        tempDateLabel = 'this_month';
+                        tempCustomStart = null;
+                        tempCustomEnd = null;
+                      }),
+                    ),
+                    _SheetFilterChip(
+                      label: 'last_month'.tr,
+                      isSelected: tempDateLabel == 'last_month',
+                      onTap: () => setModalState(() {
+                        tempDateLabel = 'last_month';
+                        tempCustomStart = null;
+                        tempCustomEnd = null;
+                      }),
+                    ),
+                    _SheetFilterChip(
+                      label: 'custom_range'.tr,
+                      isSelected: tempDateLabel == 'custom',
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final picked = await showDateRangePicker(
+                          context: context,
+                          firstDate: DateTime(2020),
+                          lastDate: now,
+                          initialDateRange: (tempCustomStart != null && tempCustomEnd != null)
+                              ? DateTimeRange(start: tempCustomStart!, end: tempCustomEnd!)
+                              : DateTimeRange(
+                                  start: DateTime(now.year, now.month, 1),
+                                  end: now,
+                                ),
+                        );
+                        if (picked != null) {
+                          setModalState(() {
+                            tempDateLabel = 'custom';
+                            tempCustomStart = picked.start;
+                            tempCustomEnd = picked.end;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                // Show selected custom range
+                if (tempDateLabel == 'custom' && tempCustomStart != null && tempCustomEnd != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.calendar, size: 14, color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${DateFormat('dd MMM yyyy').format(tempCustomStart!)} – ${DateFormat('dd MMM yyyy').format(tempCustomEnd!)}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+
+                // ── Category ──────────────────────────────────────────────
+                if (categories.isNotEmpty) ...[
+                  Text(
+                    'category'.tr,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _SheetFilterChip(
+                        label: 'all'.tr,
+                        isSelected: tempCategoryId == null,
+                        onTap: () => setModalState(() => tempCategoryId = null),
+                      ),
+                      ...categories.map((cat) => _SheetFilterChip(
+                            label: cat.name,
+                            isSelected: tempCategoryId == cat.id,
+                            onTap: () => setModalState(() => tempCategoryId = cat.id),
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                // ── Actions ───────────────────────────────────────────────
+                FormActionButtons(
+                  cancelLabel: 'clear_filters'.tr,
+                  confirmLabel: 'apply_filters'.tr,
+                  confirmIcon: LucideIcons.check,
+                  onCancel: () {
+                    setModalState(() {
+                      tempType = null;
+                      tempDateLabel = null;
+                      tempCategoryId = null;
+                      tempCustomStart = null;
+                      tempCustomEnd = null;
+                    });
+                    expenseController.clearAllFilters();
+                    Get.back();
+                  },
+                  onConfirm: () {
+                    expenseController.selectedTransactionType.value = tempType;
+                    expenseController.selectedDateRangeLabel.value = tempDateLabel;
+                    expenseController.selectedCategoryId.value = tempCategoryId;
+                    expenseController.customDateStart.value = tempCustomStart;
+                    expenseController.customDateEnd.value = tempCustomEnd;
+                    Get.back();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ── EXPENSE FORM SHEET ────────────────────────────────────────────────────────
   void _showExpenseSheet(BuildContext context, {Expense? expense}) {
     final expenseController = Get.find<ExpenseController>();
     final categoryController = Get.find<ExpenseCategoryController>();
@@ -206,26 +479,29 @@ class _ExpensePageState extends State<ExpensePage> {
       isScrollControlled: true,
       StatefulBuilder(
         builder: (context, setModalState) {
-          return _SheetScaffold(
+          return CustomFormSheet(
             title: expense == null ? 'add_expense'.tr : 'edit_expense'.tr,
             subtitle: 'expense_sheet_subtitle'.tr,
             child: Column(
               children: [
-                _TransactionTypeSelector(
-                  selected: selectedTransactionType,
-                  onChanged: (value) =>
-                      setModalState(() => selectedTransactionType = value),
+                CustomDropdownField<String>(
+                  value: selectedTransactionType,
+                  label: 'transaction_type'.tr,
+                  items: [
+                    DropdownMenuItem(value: 'expense', child: Text('expense'.tr)),
+                    DropdownMenuItem(value: 'capital', child: Text('capital'.tr)),
+                    DropdownMenuItem(value: 'drawing', child: Text('drawing'.tr)),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setModalState(() => selectedTransactionType = value);
+                    }
+                  },
                 ),
                 const SizedBox(height: 14),
-                DropdownButtonFormField<int>(
-                  initialValue: selectedCategoryId,
-                  decoration: InputDecoration(
-                    labelText: 'expense_category_label'.tr,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
+                CustomDropdownField<int>(
+                  value: selectedCategoryId,
+                  label: 'expense_category_label'.tr,
                   items: categories
                       .where((category) => category.id != null)
                       .map(
@@ -260,8 +536,16 @@ class _ExpensePageState extends State<ExpensePage> {
                     ),
                     const SizedBox(width: 14),
                     Expanded(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
+                      child: CustomTextField(
+                        label: 'expense_date'.tr,
+                        readOnly: true,
+                        controller: TextEditingController(
+                          text: DateFormat('dd MMM yyyy').format(selectedDate),
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.calendar_today_rounded,
+                          size: 18,
+                        ),
                         onTap: () async {
                           final pickedDate = await showDatePicker(
                             context: context,
@@ -293,32 +577,6 @@ class _ExpensePageState extends State<ExpensePage> {
                             }
                           }
                         },
-                        child: InputDecorator(
-                          decoration: InputDecoration(
-                            labelText: 'expense_date'.tr,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.calendar_today_rounded,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  DateFormat(
-                                    'dd MMM yyyy',
-                                  ).format(selectedDate),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     ),
                   ],
@@ -330,60 +588,46 @@ class _ExpensePageState extends State<ExpensePage> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Get.back(),
-                        child: Text('cancel'.tr),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final amount = double.tryParse(
-                            amountController.text.trim(),
-                          );
+                FormActionButtons(
+                  onConfirm: () async {
+                    final amount = double.tryParse(
+                      amountController.text.trim(),
+                    );
 
-                          if (selectedCategoryId == null ||
-                              amount == null ||
-                              amount <= 0) {
-                            Get.snackbar(
-                              'missing_details'.tr,
-                              'choose_category_and_amount'.tr,
-                            );
-                            return;
-                          }
+                    if (selectedCategoryId == null ||
+                        amount == null ||
+                        amount <= 0) {
+                      Get.snackbar(
+                        'missing_details'.tr,
+                        'choose_category_and_amount'.tr,
+                      );
+                      return;
+                    }
 
-                          final now = DateTime.now().toIso8601String();
-                          final nextExpense = Expense(
-                            id: expense?.id,
-                            categoryId:
-                                selectedCategoryId ?? categories.first.id!,
-                            amount: amount,
-                            description:
-                                descriptionController.text.trim().isEmpty
-                                ? null
-                                : descriptionController.text.trim(),
-                            paymentMethod:
-                                paymentMethodController.text.trim().isEmpty
-                                ? 'Cash'
-                                : paymentMethodController.text.trim(),
-                            transactionType: selectedTransactionType,
-                            createdAt: selectedDate.toIso8601String(),
-                            updatedAt: now,
-                          );
+                    final now = DateTime.now().toIso8601String();
+                    final nextExpense = Expense(
+                      id: expense?.id,
+                      categoryId:
+                          selectedCategoryId ?? categories.first.id!,
+                      amount: amount,
+                      description:
+                          descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      paymentMethod:
+                          paymentMethodController.text.trim().isEmpty
+                          ? 'Cash'
+                          : paymentMethodController.text.trim(),
+                      transactionType: selectedTransactionType,
+                      createdAt: selectedDate.toIso8601String(),
+                      updatedAt: now,
+                    );
 
-                          await (expense == null
-                              ? expenseController.addExpense(nextExpense)
-                              : expenseController.updateExpense(nextExpense));
-                          Get.back();
-                        },
-                        child: Text('save'.tr),
-                      ),
-                    ),
-                  ],
+                    await (expense == null
+                        ? expenseController.addExpense(nextExpense)
+                        : expenseController.updateExpense(nextExpense));
+                    Get.back();
+                  },
                 ),
               ],
             ),
@@ -399,7 +643,7 @@ class _ExpensePageState extends State<ExpensePage> {
     if (expenseId == null) return;
 
     Get.bottomSheet(
-      _SheetScaffold(
+      CustomFormSheet(
         title: 'delete_expense'.tr,
         subtitle: 'delete_expense_subtitle'.tr,
         child: Column(
@@ -407,29 +651,13 @@ class _ExpensePageState extends State<ExpensePage> {
           children: [
             Text('delete_confirm_name'.tr.replaceAll('@name', expense.categoryName ?? 'this expense')),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.deleteExpense(expenseId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                await controller.deleteExpense(expenseId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -443,6 +671,149 @@ class _ExpensePageState extends State<ExpensePage> {
   }
 }
 
+// ── ACTIVE FILTER CHIPS ─────────────────────────────────────────────────────────
+class _ActiveFilterChips extends StatelessWidget {
+  const _ActiveFilterChips({
+    required this.controller,
+    required this.categories,
+    required this.onClearAll,
+  });
+
+  final ExpenseController controller;
+  final List<ExpenseCategory> categories;
+  final VoidCallback onClearAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Obx(() {
+      final type = controller.selectedTransactionType.value;
+      final dateLabel = controller.selectedDateRangeLabel.value;
+      final catId = controller.selectedCategoryId.value;
+      final customStart = controller.customDateStart.value;
+      final customEnd = controller.customDateEnd.value;
+
+      final chips = <Widget>[];
+
+      if (type != null) {
+        chips.add(_ActiveChip(
+          label: type.tr.capitalizeFirst ?? type.tr,
+          onRemove: () => controller.selectedTransactionType.value = null,
+        ));
+      }
+      if (dateLabel != null) {
+        String label;
+        if (dateLabel == 'this_month') {
+          label = 'this_month'.tr;
+        } else if (dateLabel == 'last_month') {
+          label = 'last_month'.tr;
+        } else if (dateLabel == 'custom' && customStart != null && customEnd != null) {
+          label = '${DateFormat('dd MMM').format(customStart)} – ${DateFormat('dd MMM yyyy').format(customEnd)}';
+        } else {
+          label = dateLabel;
+        }
+        chips.add(_ActiveChip(
+          label: label,
+          onRemove: () {
+            controller.selectedDateRangeLabel.value = null;
+            controller.customDateStart.value = null;
+            controller.customDateEnd.value = null;
+          },
+        ));
+      }
+      if (catId != null) {
+        final cat = categories.firstWhereOrNull((c) => c.id == catId);
+        chips.add(_ActiveChip(
+          label: cat?.name ?? 'Category',
+          onRemove: () => controller.selectedCategoryId.value = null,
+        ));
+      }
+
+      if (chips.isEmpty) return const SizedBox.shrink();
+
+      return Container(
+        color: theme.scaffoldBackgroundColor,
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+        child: Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: chips
+                      .map((chip) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: chip,
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: onClearAll,
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              child: Text(
+                'clear_all'.tr,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red.shade600,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _ActiveChip extends StatelessWidget {
+  const _ActiveChip({required this.label, required this.onRemove});
+
+  final String label;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 5, 6, 5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onRemove,
+            child: Icon(
+              LucideIcons.x,
+              size: 13,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── SEARCH FIELD ────────────────────────────────────────────────────────────────
 class _SearchField extends StatelessWidget {
   const _SearchField({
     required this.controller,
@@ -486,6 +857,7 @@ class _SearchField extends StatelessWidget {
   }
 }
 
+// ── OVERVIEW ────────────────────────────────────────────────────────────────────
 class _ExpenseOverview extends StatelessWidget {
   const _ExpenseOverview({
     required this.totalEntries,
@@ -532,7 +904,7 @@ class _ExpenseOverview extends StatelessWidget {
               Expanded(
                 child: Text(
                   'expense_overview'.tr,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -555,7 +927,7 @@ class _ExpenseOverview extends StatelessWidget {
                 icon: const Icon(LucideIcons.chartPie, size: 16),
                 label: Text(
                   'charts'.tr,
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -672,6 +1044,7 @@ class _OverviewTile extends StatelessWidget {
   }
 }
 
+// ── EXPENSE CARD ────────────────────────────────────────────────────────────────
 class _ExpenseCard extends StatelessWidget {
   const _ExpenseCard({
     required this.expense,
@@ -811,8 +1184,8 @@ class _ExpenseCard extends StatelessWidget {
                     _InfoChip(
                       icon: LucideIcons.arrowRightLeft,
                       label:
-                          expense.transactionType.capitalizeFirst ??
-                          expense.transactionType,
+                          expense.transactionType.tr.capitalizeFirst ??
+                          expense.transactionType.tr,
                     ),
                   ],
                 ),
@@ -926,61 +1299,54 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
-class _SheetScaffold extends StatelessWidget {
-  const _SheetScaffold({
-    required this.title,
-    required this.subtitle,
-    required this.child,
+
+
+// ── FILTER CHIP (in filter sheet) ────────────────────────────────────────────
+class _SheetFilterChip extends StatelessWidget {
+  const _SheetFilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
   });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            12,
-            20,
-            MediaQuery.of(context).viewInsets.bottom + 20,
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withValues(alpha: 0.3),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
-                ),
-                const SizedBox(height: 18),
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 20),
-                child,
-              ],
-            ),
+                ]
+              : [],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : theme.textTheme.bodyMedium?.color,
           ),
         ),
       ),
@@ -988,6 +1354,7 @@ class _SheetScaffold extends StatelessWidget {
   }
 }
 
+// ── STATE CARDS ───────────────────────────────────────────────────────────────
 class _MissingCategoryState extends StatelessWidget {
   const _MissingCategoryState({required this.onPressed});
 
@@ -1041,7 +1408,7 @@ class _EmptySearchState extends StatelessWidget {
       message: 'Try a different search term or clear the current filter.',
       action: OutlinedButton(
         onPressed: onClear,
-        child: const Text('Clear Search'),
+        child: const Text('Clear Filters'),
       ),
     );
   }
@@ -1120,112 +1487,4 @@ class _StateCard extends StatelessWidget {
   }
 }
 
-class _TransactionTypeFilterBar extends StatelessWidget {
-  const _TransactionTypeFilterBar({required this.controller});
 
-  final ExpenseController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Obx(() {
-        final selected = controller.selectedTransactionType.value;
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _FilterChip(
-                label: 'All',
-                isSelected: selected == null,
-                onSelected: () =>
-                    controller.selectedTransactionType.value = null,
-              ),
-              const SizedBox(width: 8),
-              _FilterChip(
-                label: 'Capital',
-                isSelected: selected == 'capital',
-                onSelected: () =>
-                    controller.selectedTransactionType.value = 'capital',
-              ),
-              const SizedBox(width: 8),
-              _FilterChip(
-                label: 'Drawing',
-                isSelected: selected == 'drawing',
-                onSelected: () =>
-                    controller.selectedTransactionType.value = 'drawing',
-              ),
-            ],
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onSelected,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onSelected(),
-      selectedColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-      labelStyle: TextStyle(
-        color: isSelected
-            ? theme.colorScheme.primary
-            : theme.textTheme.bodyMedium?.color,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      backgroundColor: theme.cardColor,
-      side: BorderSide(
-        color: isSelected
-            ? theme.colorScheme.primary
-            : theme.dividerColor.withValues(alpha: 0.1),
-      ),
-    );
-  }
-}
-
-class _TransactionTypeSelector extends StatelessWidget {
-  const _TransactionTypeSelector({
-    required this.selected,
-    required this.onChanged,
-  });
-
-  final String selected;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: selected,
-      decoration: InputDecoration(
-        labelText: 'Transaction Type',
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-      items: const [
-        DropdownMenuItem(value: 'expense', child: Text('Expense')),
-        DropdownMenuItem(value: 'capital', child: Text('Capital')),
-        DropdownMenuItem(value: 'drawing', child: Text('Drawing')),
-      ],
-      onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
-      },
-    );
-  }
-}

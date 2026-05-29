@@ -9,6 +9,8 @@ class DashboardController extends GetxController {
   final RxDouble totalSales = 0.0.obs;
   final RxDouble totalProfit = 0.0.obs;
   final RxDouble totalExpenses = 0.0.obs;
+  final RxDouble totalCapital = 0.0.obs;
+  final RxDouble totalAllExpenses = 0.0.obs;
   final RxInt productsInStock = 0.obs;
   final RxInt totalProducts = 0.obs;
   final RxList<DashboardTrendPoint> orderTrendPoints =
@@ -33,6 +35,8 @@ class DashboardController extends GetxController {
       _repository.totalExpenses(),
       _repository.itemsInStock(),
       _repository.countProducts(),
+      _repository.totalCapital(),
+      _repository.totalAllExpenses(),
     ]);
 
     totalOrders.value = results[0] as int;
@@ -41,9 +45,12 @@ class DashboardController extends GetxController {
     totalExpenses.value = results[3] as double;
     productsInStock.value = results[4] as int;
     totalProducts.value = results[5] as int;
+    totalCapital.value = results[6] as double;
+    totalAllExpenses.value = results[7] as double;
   }
 
-  double get actualProfit => totalProfit.value - totalExpenses.value;
+  double get actualProfit => totalProfit.value - (totalExpenses.value + totalCapital.value);
+  double get profitMinusExpenses => totalProfit.value - totalAllExpenses.value;
 
   Future<void> loadChartData() async {
     final items = await _repository.orderTrend(

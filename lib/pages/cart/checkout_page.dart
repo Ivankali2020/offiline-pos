@@ -125,50 +125,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Obx(
-                () => _CheckoutHero(
-                  currencyFormat: _currencyFormat,
-                  totalAmount: controller.totalAmount,
-                  subTotal: controller.subTotal,
-                  dueAmount: controller.dueAmount,
-                  totalQuantity: controller.totalQuantity,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _CheckoutSectionCard(
-                title: 'order_summary'.tr,
-                icon: Icons.receipt_long_rounded,
-                child: Column(
-                  children: [
-                    _buildSummaryRow('subtotal'.tr, controller.subTotal),
-                    Obx(
-                      () => _buildSummaryRow(
-                        'discount'.tr,
-                        -controller.discountAmount,
-                        color: Colors.red.shade600,
-                      ),
-                    ),
-                    _buildSummaryRow('tax'.tr, controller.taxAmount),
-                    Obx(
-                      () => _buildSummaryRow(
-                        'shipping_fees'.tr,
-                        controller.deliveryFees.value,
-                      ),
-                    ),
-                    const Divider(height: 24),
-                    Obx(
-                      () => _buildSummaryRow(
-                        'total'.tr,
-                        controller.totalAmount,
-                        isBold: true,
-                        fontSize: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+
               _CheckoutSectionCard(
                 title: 'payment_setup'.tr,
                 icon: Icons.account_balance_wallet_outlined,
@@ -217,6 +174,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               if (amount == null || amount <= 0) {
                                 return 'received_amount_error'.tr;
                               }
+                              if (amount < controller.totalAmount) {
+                                return 'received_amount_min_error'.tr;
+                              }
                               return null;
                             },
                             suffixIcon: const Icon(
@@ -237,23 +197,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       },
                     ),
                     const SizedBox(height: 14),
-                    _QuickDiscountChips(
-                      onApplyPercent: (value) {
-                        controller.isPercentageDiscount.value = true;
-                        controller.discountValue.value = value.toDouble();
-                        _discountController.text = value.toString();
-                      },
-                      onApplyFlat: (value) {
-                        controller.isPercentageDiscount.value = false;
-                        controller.discountValue.value = value.toDouble();
-                        _discountController.text = value.toString();
-                      },
-                      onClear: () {
-                        controller.discountValue.value = 0;
-                        _discountController.text = '0';
-                      },
-                    ),
-                    const SizedBox(height: 14),
+                   
                     Row(
                       children: [
                         Expanded(
@@ -303,6 +247,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 14),
+                     _QuickDiscountChips(
+                      onApplyPercent: (value) {
+                        controller.isPercentageDiscount.value = true;
+                        controller.discountValue.value = value.toDouble();
+                        _discountController.text = value.toString();
+                      },
+                      onApplyFlat: (value) {
+                        controller.isPercentageDiscount.value = false;
+                        controller.discountValue.value = value.toDouble();
+                        _discountController.text = value.toString();
+                      },
+                      onClear: () {
+                        controller.discountValue.value = 0;
+                        _discountController.text = '0';
+                      },
                     ),
                   ],
                 ),
@@ -355,7 +316,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                       ),
                       Text(
-                        'MMK ${_currencyFormat.format(amount)}',
+                        'Ks ${_currencyFormat.format(amount)}',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
@@ -366,6 +327,40 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 );
               }),
+              const SizedBox(height: 16),
+              _CheckoutSectionCard(
+                title: 'order_summary'.tr,
+                icon: Icons.receipt_long_rounded,
+                child: Column(
+                  children: [
+                    _buildSummaryRow('subtotal'.tr, controller.subTotal),
+                    Obx(
+                      () => _buildSummaryRow(
+                        'discount'.tr,
+                        -controller.discountAmount,
+                        color: Colors.red.shade600,
+                      ),
+                    ),
+                    _buildSummaryRow('tax'.tr, controller.taxAmount),
+                    Obx(
+                      () => _buildSummaryRow(
+                        'shipping_fees'.tr,
+                        controller.deliveryFees.value,
+                      ),
+                    ),
+                    const Divider(height: 24),
+                    Obx(
+                      () => _buildSummaryRow(
+                        'total'.tr,
+                        controller.totalAmount,
+                        isBold: true,
+                        fontSize: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               _CheckoutSectionCard(
                 title: 'payment_proof'.tr,
@@ -466,6 +461,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
       return;
     }
+    if (receivedAmount < controller.totalAmount) {
+      Get.snackbar(
+        'invalid_received_amount'.tr,
+        'received_amount_min_error'.tr,
+      );
+      return;
+    }
 
     final savedOrder = await orderController.checkout(
       controller.items.toList(),
@@ -531,118 +533,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 }
 
-class _CheckoutHero extends StatelessWidget {
-  const _CheckoutHero({
-    required this.currencyFormat,
-    required this.totalAmount,
-    required this.subTotal,
-    required this.dueAmount,
-    required this.totalQuantity,
-  });
-
-  final NumberFormat currencyFormat;
-  final double totalAmount;
-  final double subTotal;
-  final double dueAmount;
-  final int totalQuantity;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary,
-            Color.alphaBlend(
-              Colors.white.withValues(alpha: 0.08),
-              theme.colorScheme.primary,
-            ),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.primary.withValues(alpha: 0.20),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(Icons.payments_rounded, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'checkout'.tr,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '$totalQuantity ${'qty'.tr} ${'ready_to_finalize'.tr}',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.86),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'MMK ${currencyFormat.format(totalAmount)}',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _CheckoutHeroChip(
-                  label: 'subtotal'.tr,
-                  value: 'MMK ${currencyFormat.format(subTotal)}',
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _CheckoutHeroChip(
-                  label: dueAmount < 0 ? 'change_amount'.tr : 'due_amount'.tr,
-                  value:
-                      'MMK ${currencyFormat.format(dueAmount < 0 ? -dueAmount : dueAmount)}',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _CheckoutSectionCard extends StatelessWidget {
   const _CheckoutSectionCard({
@@ -791,14 +681,15 @@ class _CompactPaymentSelector extends StatelessWidget {
       }
 
       return Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.primary.withValues(alpha: 0.08),
-          ),
-        ),
+        margin: EdgeInsets.only(bottom: 16),
+        // padding: const EdgeInsets.all(12),
+        // decoration: BoxDecoration(
+        //   color: theme.colorScheme.primary.withValues(alpha: 0.05),
+        //   borderRadius: BorderRadius.circular(16),
+        //   border: Border.all(
+        //     color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        //   ),
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -806,7 +697,7 @@ class _CompactPaymentSelector extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Payment & Account',
+                    'payment_and_account'.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -815,7 +706,7 @@ class _CompactPaymentSelector extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onManagePayments,
                   icon: const Icon(LucideIcons.settings2, size: 16),
-                  label: const Text('Manage'),
+                  label: Text('manage'.tr),
                 ),
               ],
             ),
@@ -842,7 +733,7 @@ class _CompactPaymentSelector extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  'No account linked to this payment. You can still continue, or add one from Payments.',
+                  'no_account_linked_warning'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.textTheme.bodySmall?.color?.withValues(
                       alpha: 0.74,
@@ -852,7 +743,7 @@ class _CompactPaymentSelector extends StatelessWidget {
               )
             else ...[
               Text(
-                'Select account',
+                'select_account'.tr,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.textTheme.bodySmall?.color?.withValues(
                     alpha: 0.72,
@@ -970,7 +861,7 @@ class _QuickAmountChips extends StatelessWidget {
         runSpacing: 8,
         children: list.map((amount) {
           return ActionChip(
-            label: Text('MMK ${currencyFormat.format(amount)}'),
+            label: Text('Ks ${currencyFormat.format(amount)}'),
             onPressed: () => onSelectAmount(amount),
             backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.08),
             side: BorderSide(
@@ -1014,18 +905,18 @@ class _PaymentImageSection extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onPickFromGallery,
               icon: const Icon(Icons.photo_library_outlined, size: 18),
-              label: const Text('Gallery'),
+              label: Text('gallery'.tr),
             ),
             OutlinedButton.icon(
               onPressed: onPickFromCamera,
               icon: const Icon(Icons.photo_camera_outlined, size: 18),
-              label: const Text('Camera'),
+              label: Text('camera'.tr),
             ),
             if (imagePath != null)
               TextButton.icon(
                 onPressed: onRemove,
                 icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text('Remove'),
+                label: Text('remove'.tr),
               ),
           ],
         ),
@@ -1042,7 +933,7 @@ class _PaymentImageSection extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Optional. Upload a payment slip or receipt image if this sale needs proof.',
+                'payment_slip_optional_hint'.tr,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.textTheme.bodySmall?.color?.withValues(
                   alpha: 0.76,
@@ -1065,7 +956,7 @@ class _PaymentImageSection extends StatelessWidget {
                       return Container(
                         color: Colors.black.withValues(alpha: 0.04),
                         alignment: Alignment.center,
-                        child: const Text('Preview unavailable'),
+                        child: Text('preview_unavailable'.tr),
                       );
                     },
                   ),
@@ -1119,7 +1010,7 @@ class _QuickDiscountChips extends StatelessWidget {
           _DiscountChip(label: '1000 Ks', onTap: () => onApplyFlat(1000)),
           ActionChip(
             avatar: const Icon(Icons.restart_alt_rounded, size: 16),
-            label: const Text('Clear'),
+            label: Text('clear'.tr),
             onPressed: onClear,
             backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.08),
           ),
@@ -1153,42 +1044,3 @@ class _DiscountChip extends StatelessWidget {
   }
 }
 
-class _CheckoutHeroChip extends StatelessWidget {
-  const _CheckoutHeroChip({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

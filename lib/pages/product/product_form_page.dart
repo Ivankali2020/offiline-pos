@@ -17,7 +17,10 @@ import 'package:abpos/models/brand.dart';
 import 'package:abpos/models/category.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_dropdown_field.dart';
 import 'package:abpos/widgets/form/custom_nav_selector.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:abpos/widgets/form/barcode_scanner_button.dart';
 
 import 'package:abpos/widgets/app_bottom_action_bar.dart';
@@ -109,19 +112,9 @@ class _ProductAttributeSelector extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<int>(
-                  initialValue: draft.attribute?.id,
-                  decoration: InputDecoration(
-                    labelText: 'attributes'.tr,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                child: CustomDropdownField<int>(
+                  value: draft.attribute?.id,
+                  label: 'attributes'.tr,
                   items: attributes
                       .map(
                         (attribute) => DropdownMenuItem<int>(
@@ -146,19 +139,9 @@ class _ProductAttributeSelector extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          DropdownButtonFormField<int>(
-            initialValue: draft.value?.id,
-            decoration: InputDecoration(
-              labelText: 'attribute_value'.tr,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+          CustomDropdownField<int>(
+            value: draft.value?.id,
+            label: 'attribute_value'.tr,
             items: draft.values
                 .map(
                   (value) => DropdownMenuItem<int>(
@@ -601,168 +584,114 @@ class _ProductFormPageState extends State<ProductFormPage> {
             });
           }
 
-          return Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(28),
-              ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  12,
-                  20,
-                  MediaQuery.of(context).viewInsets.bottom + 20,
-                ),
-                child: Form(
-                  key: formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 44,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                        ),
-                        const Gap(20),
-                        Text(
-                          variant == null ? 'add_variant'.tr : 'edit'.tr,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const Gap(6),
-                        Text(
-                          'set_compact_variant_details'.tr,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: Colors.grey.shade600),
-                        ),
-                        const Gap(20),
-                        CustomTextField(
-                          controller: nameCtrl,
-                          label: 'name'.tr,
+          return CustomFormSheet(
+            title: variant == null ? 'add_variant'.tr : 'edit'.tr,
+            subtitle: 'set_compact_variant_details'.tr,
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomTextField(
+                    controller: nameCtrl,
+                    label: 'name'.tr,
+                    isRequired: true,
+                    validator: _requiredTextValidator,
+                  ),
+                  const Gap(14),
+                  _VariantAttributeEditor(
+                    drafts: attributeDrafts,
+                    onAdd: () => setSheetState(
+                      () => attributeDrafts.add(_ProductAttributeDraft()),
+                    ),
+                    onRemove: (draftIndex) => setSheetState(
+                      () => attributeDrafts.removeAt(draftIndex),
+                    ),
+                    onAttributeChanged: selectVariantAttribute,
+                    onValueChanged: (draftIndex, value) {
+                      setSheetState(() {
+                        attributeDrafts[draftIndex] =
+                            attributeDrafts[draftIndex].copyWith(
+                              value: value,
+                            );
+                      });
+                    },
+                  ),
+                  const Gap(14),
+                  CustomTextField(
+                    controller: skuCtrl,
+                    label: 'sku_barcode'.tr,
+                    isRequired: true,
+                    validator: _requiredTextValidator,
+                    suffixIcon: BarcodeScannerButton(
+                      onScan: (code) => skuCtrl.text = code,
+                    ),
+                  ),
+                  const Gap(14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: stockCtrl,
+                          label: 'qty'.tr,
                           isRequired: true,
-                          validator: _requiredTextValidator,
+                          keyboardType: TextInputType.number,
+                          validator: _requiredIntegerValidator,
                         ),
-                        const Gap(14),
-                        _VariantAttributeEditor(
-                          drafts: attributeDrafts,
-                          onAdd: () => setSheetState(
-                            () => attributeDrafts.add(_ProductAttributeDraft()),
-                          ),
-                          onRemove: (draftIndex) => setSheetState(
-                            () => attributeDrafts.removeAt(draftIndex),
-                          ),
-                          onAttributeChanged: selectVariantAttribute,
-                          onValueChanged: (draftIndex, value) {
-                            setSheetState(() {
-                              attributeDrafts[draftIndex] =
-                                  attributeDrafts[draftIndex].copyWith(
-                                    value: value,
-                                  );
-                            });
-                          },
-                        ),
-                        const Gap(14),
-                        CustomTextField(
-                          controller: skuCtrl,
-                          label: 'sku_barcode'.tr,
-                          isRequired: true,
-                          validator: _requiredTextValidator,
-                          suffixIcon: BarcodeScannerButton(
-                            onScan: (code) => skuCtrl.text = code,
-                          ),
-                        ),
-                        const Gap(14),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomTextField(
-                                controller: stockCtrl,
-                                label: 'qty'.tr,
-                                isRequired: true,
-                                keyboardType: TextInputType.number,
-                                validator: _requiredIntegerValidator,
-                              ),
-                            ),
-                            const Gap(14),
-                            Expanded(
-                              child: CustomTextField(
-                                controller: buyPriceCtrl,
-                                label: 'buy_price'.tr,
-                                isRequired: true,
-                                keyboardType: TextInputType.number,
-                                validator: _requiredNumberValidator,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Gap(14),
-                        CustomTextField(
-                          controller: sellPriceCtrl,
-                          label: 'sell_price'.tr,
+                      ),
+                      const Gap(14),
+                      Expanded(
+                        child: CustomTextField(
+                          controller: buyPriceCtrl,
+                          label: 'buy_price'.tr,
                           isRequired: true,
                           keyboardType: TextInputType.number,
                           validator: _requiredNumberValidator,
                         ),
-                        const Gap(20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Get.back(),
-                                child: Text('cancel'.tr),
-                              ),
-                            ),
-                            const Gap(12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (!formKey.currentState!.validate()) return;
-
-                                  final updatedVariant = Variant(
-                                    id: variant?.id,
-                                    productId: variant?.productId ?? 0,
-                                    name: nameCtrl.text.trim(),
-                                    attributes: _encodeAttributeDrafts(
-                                      attributeDrafts,
-                                    ),
-                                    sku: skuCtrl.text.trim(),
-                                    stockQuantity:
-                                        int.tryParse(stockCtrl.text) ?? 0,
-                                    sellPrice:
-                                        double.tryParse(sellPriceCtrl.text) ??
-                                        0,
-                                    buyPrice:
-                                        double.tryParse(buyPriceCtrl.text) ?? 0,
-                                  );
-
-                                  if (index != null) {
-                                    _variants[index] = updatedVariant;
-                                  } else {
-                                    _variants.add(updatedVariant);
-                                  }
-                                  Get.back();
-                                },
-                                child: Text(
-                                  variant == null ? 'add'.tr : 'save'.tr,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
+                  const Gap(14),
+                  CustomTextField(
+                    controller: sellPriceCtrl,
+                    label: 'sell_price'.tr,
+                    isRequired: true,
+                    keyboardType: TextInputType.number,
+                    validator: _requiredNumberValidator,
+                  ),
+                  const Gap(20),
+                  FormActionButtons(
+                    confirmLabel: variant == null ? 'add'.tr : 'save'.tr,
+                    onConfirm: () {
+                      if (!formKey.currentState!.validate()) return;
+
+                      final updatedVariant = Variant(
+                        id: variant?.id,
+                        productId: variant?.productId ?? 0,
+                        name: nameCtrl.text.trim(),
+                        attributes: _encodeAttributeDrafts(
+                          attributeDrafts,
+                        ),
+                        sku: skuCtrl.text.trim(),
+                        stockQuantity:
+                            int.tryParse(stockCtrl.text) ?? 0,
+                        sellPrice:
+                            double.tryParse(sellPriceCtrl.text) ??
+                            0,
+                        buyPrice:
+                            double.tryParse(buyPriceCtrl.text) ?? 0,
+                      );
+
+                      if (index != null) {
+                        _variants[index] = updatedVariant;
+                      } else {
+                        _variants.add(updatedVariant);
+                      }
+                      Get.back();
+                    },
+                  ),
+                ],
               ),
             ),
           );

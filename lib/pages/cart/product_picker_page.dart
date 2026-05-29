@@ -142,12 +142,6 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
                     product: product,
                     onTap: () {
                       cartController.addProduct(product);
-                      Get.snackbar(
-                        'success'.tr,
-                        '${product.name} ${'added_to_cart'.tr}',
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 1),
-                      );
                     },
                   );
                 },

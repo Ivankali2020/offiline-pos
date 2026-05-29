@@ -5,6 +5,9 @@ import 'package:abpos/controllers/brand_controller.dart';
 import 'package:abpos/models/brand.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
+import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 
 class BrandPage extends StatefulWidget {
   const BrandPage({super.key});
@@ -110,64 +113,41 @@ class _BrandPageState extends State<BrandPage> {
 
     Get.bottomSheet(
       isScrollControlled: true,
-      _CrudSheet(
+      CustomFormSheet(
         title: brand == null ? 'add_brand'.tr : 'edit_brand'.tr,
         subtitle: 'brand_sheet_subtitle'.tr,
         child: Column(
           children: [
-            TextField(
+            CustomTextField(
               controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'name'.tr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+              label: 'name'.tr,
+              isRequired: true,
             ),
             const SizedBox(height: 14),
-            TextField(
+            CustomTextField(
               controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'description'.tr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+              label: 'description'.tr,
               maxLines: 3,
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (nameController.text.trim().isEmpty) return;
+            FormActionButtons(
+              onConfirm: () {
+                if (nameController.text.trim().isEmpty) return;
 
-                      final newBrand = Brand(
-                        id: brand?.id,
-                        sellerId: 1,
-                        name: nameController.text.trim(),
-                        description: descriptionController.text.trim(),
-                      );
+                final newBrand = Brand(
+                  id: brand?.id,
+                  sellerId: 1,
+                  name: nameController.text.trim(),
+                  description: descriptionController.text.trim(),
+                );
 
-                      if (brand == null) {
-                        controller.addBrand(newBrand);
-                      } else {
-                        controller.updateBrand(newBrand);
-                      }
-                      Get.back();
-                    },
-                    child: Text('save'.tr),
-                  ),
-                ),
-              ],
+                if (brand == null) {
+                  controller.addBrand(newBrand);
+                } else {
+                  controller.updateBrand(newBrand);
+                }
+                Get.back();
+              },
             ),
           ],
         ),
@@ -181,7 +161,7 @@ class _BrandPageState extends State<BrandPage> {
     if (brandId == null) return;
 
     Get.bottomSheet(
-      _CrudSheet(
+      CustomFormSheet(
         title: 'delete_brand'.tr,
         subtitle: 'delete_brand_subtitle'.tr,
         child: Column(
@@ -189,29 +169,13 @@ class _BrandPageState extends State<BrandPage> {
           children: [
             Text('delete_brand_confirm'.trParams({'name': brand.name})),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.deleteBrand(brandId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () {
+                controller.deleteBrand(brandId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -385,64 +349,4 @@ class _CrudCard extends StatelessWidget {
   }
 }
 
-class _CrudSheet extends StatelessWidget {
-  const _CrudSheet({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            12,
-            20,
-            MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 20),
-                child,
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

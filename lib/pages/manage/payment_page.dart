@@ -4,6 +4,8 @@ import 'package:abpos/models/payment_account.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/custom_text_field.dart';
+import 'package:abpos/widgets/form/custom_form_sheet.dart';
+import 'package:abpos/widgets/form/form_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -142,12 +144,12 @@ class _PaymentPageState extends State<PaymentPage> {
 
     Get.bottomSheet(
       isScrollControlled: true,
-      _SheetScaffold(
-        title: payment == null ? 'add_payment'.tr : 'edit_payment'.tr,
-        subtitle: 'payment_sheet_subtitle'.tr,
-        child: StatefulBuilder(
-          builder: (context, setModalState) {
-            return Form(
+      StatefulBuilder(
+        builder: (context, setModalState) {
+          return CustomFormSheet(
+            title: payment == null ? 'add_payment'.tr : 'edit_payment'.tr,
+            subtitle: 'payment_sheet_subtitle'.tr,
+            child: Form(
               key: formKey,
               child: Column(
                 children: [
@@ -180,46 +182,32 @@ class _PaymentPageState extends State<PaymentPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Get.back(),
-                          child: Text('cancel'.tr),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (!formKey.currentState!.validate()) return;
-                            final now = DateTime.now().toIso8601String();
-                            final nextPayment = Payment(
-                              id: payment?.id,
-                              name: nameController.text.trim(),
-                              note: _blankToNull(noteController.text),
-                              isPublished: isPublished,
-                              createdAt: payment?.createdAt ?? now,
-                              updatedAt: now,
-                            );
+                  FormActionButtons(
+                    onConfirm: () async {
+                      if (!formKey.currentState!.validate()) return;
+                      final now = DateTime.now().toIso8601String();
+                      final nextPayment = Payment(
+                        id: payment?.id,
+                        name: nameController.text.trim(),
+                        note: _blankToNull(noteController.text),
+                        isPublished: isPublished,
+                        createdAt: payment?.createdAt ?? now,
+                        updatedAt: now,
+                      );
 
-                            if (payment == null) {
-                              await controller.addPayment(nextPayment);
-                            } else {
-                              await controller.updatePayment(nextPayment);
-                            }
-                            Get.back();
-                          },
-                          child: Text('save'.tr),
-                        ),
-                      ),
-                    ],
+                      if (payment == null) {
+                        await controller.addPayment(nextPayment);
+                      } else {
+                        await controller.updatePayment(nextPayment);
+                      }
+                      Get.back();
+                    },
                   ),
                 ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -236,7 +224,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
     Get.bottomSheet(
       isScrollControlled: true,
-      _SheetScaffold(
+      CustomFormSheet(
         title: account == null ? 'add_account'.tr : 'edit_account'.tr,
         subtitle: 'account_sheet_subtitle'.tr.replaceAll('@name', payment.name),
         child: Form(
@@ -262,40 +250,26 @@ class _PaymentPageState extends State<PaymentPage> {
                     : null,
               ),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!formKey.currentState!.validate()) return;
-                        final now = DateTime.now().toIso8601String();
-                        final nextAccount = PaymentAccount(
-                          id: account?.id,
-                          paymentId: payment.id ?? 0,
-                          name: nameController.text.trim(),
-                          number: numberController.text.trim(),
-                          createdAt: account?.createdAt ?? now,
-                          updatedAt: now,
-                        );
+              FormActionButtons(
+                onConfirm: () async {
+                  if (!formKey.currentState!.validate()) return;
+                  final now = DateTime.now().toIso8601String();
+                  final nextAccount = PaymentAccount(
+                    id: account?.id,
+                    paymentId: payment.id ?? 0,
+                    name: nameController.text.trim(),
+                    number: numberController.text.trim(),
+                    createdAt: account?.createdAt ?? now,
+                    updatedAt: now,
+                  );
 
-                        if (account == null) {
-                          await controller.addAccount(nextAccount);
-                        } else {
-                          await controller.updateAccount(nextAccount);
-                        }
-                        Get.back();
-                      },
-                      child: Text('save'.tr),
-                    ),
-                  ),
-                ],
+                  if (account == null) {
+                    await controller.addAccount(nextAccount);
+                  } else {
+                    await controller.updateAccount(nextAccount);
+                  }
+                  Get.back();
+                },
               ),
             ],
           ),
@@ -310,7 +284,7 @@ class _PaymentPageState extends State<PaymentPage> {
     if (paymentId == null) return;
 
     Get.bottomSheet(
-      _SheetScaffold(
+      CustomFormSheet(
         title: 'delete_payment'.tr,
         subtitle: 'delete_payment_subtitle'.tr,
         child: Column(
@@ -318,29 +292,13 @@ class _PaymentPageState extends State<PaymentPage> {
           children: [
             Text('delete_payment_confirm'.tr.replaceAll('@name', payment.name)),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.deletePayment(paymentId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                await controller.deletePayment(paymentId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -354,7 +312,7 @@ class _PaymentPageState extends State<PaymentPage> {
     if (accountId == null) return;
 
     Get.bottomSheet(
-      _SheetScaffold(
+      CustomFormSheet(
         title: 'delete_account'.tr,
         subtitle: 'delete_account_subtitle'.tr,
         child: Column(
@@ -362,29 +320,13 @@ class _PaymentPageState extends State<PaymentPage> {
           children: [
             Text('delete_confirm_name'.tr.replaceAll('@name', account.name)),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.deleteAccount(accountId);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('delete'.tr),
-                  ),
-                ),
-              ],
+            FormActionButtons(
+              confirmLabel: 'delete'.tr,
+              isDestructive: true,
+              onConfirm: () async {
+                await controller.deleteAccount(accountId);
+                Get.back();
+              },
             ),
           ],
         ),
@@ -894,62 +836,4 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _SheetScaffold extends StatelessWidget {
-  const _SheetScaffold({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-  });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + bottomInset),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey.shade600,
-                height: 1.35,
-              ),
-            ),
-            const SizedBox(height: 20),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-}
