@@ -8,6 +8,8 @@ abstract class AppRoutes {
   static const productPicker = '/product-picker';
   static const checkout = '/checkout';
   static const orders = '/orders';
+  static const orderReturns = '/order-returns';
+  static const orderReturnCreate = '/order-returns/create';
   static const purchases = '/purchases';
   static const purchaseCreate = '/purchases/create';
   static const purchaseProductPicker = '/purchases/product-picker';

@@ -1,20 +1,23 @@
-import 'package:abpos/controllers/order_controller.dart';
+import 'package:abpos/controllers/order_return_controller.dart';
 import 'package:abpos/widgets/app_bottom_sheet.dart';
 import 'package:abpos/widgets/form/barcode_scanner_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class OrderFilterBottomSheet extends StatefulWidget {
-  const OrderFilterBottomSheet({super.key, required this.controller});
+class OrderReturnFilterBottomSheet extends StatefulWidget {
+  const OrderReturnFilterBottomSheet({super.key, required this.controller});
 
-  final OrderController controller;
+  final OrderReturnController controller;
 
-  static Future<void> show(BuildContext context, OrderController controller) {
+  static Future<void> show(
+    BuildContext context,
+    OrderReturnController controller,
+  ) {
     return AppBottomSheet.show<void>(
       context,
-      title: 'filter_orders'.tr,
-      subtitle: 'filter_orders_subtitle'.tr,
+      title: 'filter_returns'.tr,
+      subtitle: 'filter_returns_subtitle'.tr,
       trailing: TextButton(
         onPressed: () {
           controller.clearFilters();
@@ -22,19 +25,21 @@ class OrderFilterBottomSheet extends StatefulWidget {
         },
         child: Text('reset'.tr),
       ),
-      child: OrderFilterBottomSheet(controller: controller),
+      child: OrderReturnFilterBottomSheet(controller: controller),
     );
   }
 
   @override
-  State<OrderFilterBottomSheet> createState() => _OrderFilterBottomSheetState();
+  State<OrderReturnFilterBottomSheet> createState() =>
+      _OrderReturnFilterBottomSheetState();
 }
 
-class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
+class _OrderReturnFilterBottomSheetState
+    extends State<OrderReturnFilterBottomSheet> {
   late final TextEditingController _invoiceController;
   late DateTime? _startDate;
   late DateTime? _endDate;
-  late OrderDateFilterPreset? _selectedPreset;
+  late ReturnDateFilterPreset? _selectedPreset;
   final DateFormat _dateFormat = DateFormat('dd MMM yyyy');
 
   @override
@@ -92,9 +97,9 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _buildPresetChip(OrderDateFilterPreset.today, 'today'.tr),
-            _buildPresetChip(OrderDateFilterPreset.thisWeek, 'this_week'.tr),
-            _buildPresetChip(OrderDateFilterPreset.thisMonth, 'this_month'.tr),
+            _buildPresetChip(ReturnDateFilterPreset.today, 'today'.tr),
+            _buildPresetChip(ReturnDateFilterPreset.thisWeek, 'this_week'.tr),
+            _buildPresetChip(ReturnDateFilterPreset.thisMonth, 'this_month'.tr),
           ],
         ),
         const SizedBox(height: 24),
@@ -178,7 +183,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
     );
   }
 
-  Widget _buildPresetChip(OrderDateFilterPreset preset, String label) {
+  Widget _buildPresetChip(ReturnDateFilterPreset preset, String label) {
     final selected = _selectedPreset == preset;
     return ChoiceChip(
       label: Text(label),
@@ -190,19 +195,19 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
         setState(() {
           _selectedPreset = preset;
           switch (preset) {
-            case OrderDateFilterPreset.today:
+            case ReturnDateFilterPreset.today:
               _startDate = today;
               _endDate = today;
               break;
-            case OrderDateFilterPreset.thisWeek:
+            case ReturnDateFilterPreset.thisWeek:
               _startDate = today.subtract(Duration(days: now.weekday - 1));
               _endDate = _startDate!.add(const Duration(days: 6));
               break;
-            case OrderDateFilterPreset.thisMonth:
+            case ReturnDateFilterPreset.thisMonth:
               _startDate = DateTime(now.year, now.month, 1);
               _endDate = DateTime(now.year, now.month + 1, 0);
               break;
-            case OrderDateFilterPreset.custom:
+            case ReturnDateFilterPreset.custom:
               break;
           }
         });
@@ -233,9 +238,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
       lastDate: DateTime(2100),
     );
 
-    if (picked == null) {
-      return;
-    }
+    if (picked == null) return;
 
     setState(() {
       if (isStart) {
@@ -249,7 +252,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
           _startDate = _endDate;
         }
       }
-      _selectedPreset = OrderDateFilterPreset.custom;
+      _selectedPreset = ReturnDateFilterPreset.custom;
     });
   }
 
@@ -259,7 +262,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
     if (_startDate == null && _endDate == null) {
       widget.controller.clearDateFilter();
     } else if (_selectedPreset != null &&
-        _selectedPreset != OrderDateFilterPreset.custom) {
+        _selectedPreset != ReturnDateFilterPreset.custom) {
       widget.controller.applyDatePreset(_selectedPreset!);
     } else {
       widget.controller.setCustomDateRange(_startDate, _endDate);
@@ -269,9 +272,7 @@ class _OrderFilterBottomSheetState extends State<OrderFilterBottomSheet> {
   }
 
   String _formatDate(DateTime? value) {
-    if (value == null) {
-      return 'select_date'.tr;
-    }
+    if (value == null) return 'select_date'.tr;
     return _dateFormat.format(value);
   }
 }
@@ -295,30 +296,39 @@ class _DateButton extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Ink(
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.25)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.18)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                Icon(icon, size: 18, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+            Icon(icon, size: 20, color: theme.colorScheme.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.65,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(value, style: theme.textTheme.bodyLarge),
           ],
         ),
       ),

@@ -235,6 +235,17 @@ class _OverviewGrid extends StatelessWidget {
           ),
           Obx(
             () => _StatCard(
+              label: 'returns'.tr,
+              value: DashboardPage._numberFormat.format(
+                controller.totalReturns.value,
+              ),
+              suffix: 'MMK',
+              icon: Icons.assignment_return_rounded,
+              color: const Color(0xFFF43F5E),
+            ),
+          ),
+          Obx(
+            () => _StatCard(
               label: 'expenses'.tr,
               value: DashboardPage._numberFormat.format(
                 controller.totalExpenses.value + controller.totalCapital.value,
@@ -469,6 +480,13 @@ class _QuickActionGrid extends StatelessWidget {
             LucideIcons.history,
             const Color(0xFFDC2626),
             () => Get.toNamed(AppRoutes.orders),
+          ),
+          _QuickActionData(
+            'returns'.tr,
+            'manage_order_returns'.tr,
+            Icons.assignment_return_rounded,
+            const Color(0xFFF43F5E),
+            () => Get.toNamed(AppRoutes.orderReturns),
           ),
           _QuickActionData(
             'products'.tr,

@@ -8,6 +8,7 @@ class DashboardController extends GetxController {
   final RxInt totalOrders = 0.obs;
   final RxDouble totalSales = 0.0.obs;
   final RxDouble totalProfit = 0.0.obs;
+  final RxDouble totalReturns = 0.0.obs;
   final RxDouble totalExpenses = 0.0.obs;
   final RxDouble totalCapital = 0.0.obs;
   final RxDouble totalAllExpenses = 0.0.obs;
@@ -37,11 +38,13 @@ class DashboardController extends GetxController {
       _repository.countProducts(),
       _repository.totalCapital(),
       _repository.totalAllExpenses(),
+      _repository.totalReturnAmount(),
     ]);
 
     totalOrders.value = results[0] as int;
     totalSales.value = results[1] as double;
-    totalProfit.value = results[2] as double;
+    totalReturns.value = results[8] as double;
+    totalProfit.value = (results[2] as double) - totalReturns.value;
     totalExpenses.value = results[3] as double;
     productsInStock.value = results[4] as int;
     totalProducts.value = results[5] as int;

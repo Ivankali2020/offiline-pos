@@ -7,10 +7,12 @@ import 'package:abpos/controllers/settings_controller.dart';
 import 'package:abpos/models/order.dart';
 import 'package:abpos/models/order_product.dart';
 import 'package:abpos/models/settings.dart';
+import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/services/receipt_printer_utils.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/thermal_receipt_widget.dart';
+import 'package:barcode_widget/barcode_widget.dart' as bw;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -54,33 +56,30 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         title: 'thermal_receipt'.tr,
         subtitle: 'receipt_subtitle'.tr,
         actions: [
-            IconButton(
-              onPressed: _isPrinting ? null : () => _printReceipt(context),
-              icon: _isPrinting
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: theme.colorScheme.primary,
-                      ),
-                    )
-                  : Icon(
-                      Icons.print_rounded,
+          IconButton(
+            onPressed: _isPrinting ? null : () => _printReceipt(context),
+            icon: _isPrinting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
                       color: theme.colorScheme.primary,
                     ),
-              tooltip: 'print_receipt'.tr,
-            ),
-            if (hasSlip)
-              IconButton(
-                onPressed: _showSlipPreview,
-                icon: Icon(
-                  Icons.receipt_long_rounded,
-                  color: theme.colorScheme.primary,
-                ),
-                tooltip: 'payment_slip'.tr,
+                  )
+                : Icon(Icons.print_rounded, color: theme.colorScheme.primary),
+            tooltip: 'print_receipt'.tr,
+          ),
+          if (hasSlip)
+            IconButton(
+              onPressed: _showSlipPreview,
+              icon: Icon(
+                Icons.receipt_long_rounded,
+                color: theme.colorScheme.primary,
               ),
-          ],
+              tooltip: 'payment_slip'.tr,
+            ),
+        ],
       ),
       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(
         alpha: 0.20,
@@ -119,6 +118,23 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     children: [
                       _buildReceiptCard(context, items, settings),
                       const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: () => Get.toNamed(
+                          AppRoutes.orderReturnCreate,
+                          arguments: {'order': widget.order, 'products': items},
+                        ),
+                        icon: const Icon(Icons.assignment_return_rounded),
+                        label: Text('create_return'.tr),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFF43F5E),
+                          side: const BorderSide(color: Color(0xFFF43F5E)),
+                          minimumSize: const Size.fromHeight(52),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       OutlinedButton.icon(
                         onPressed: () => Get.back(),
                         icon: const Icon(Icons.arrow_back_rounded),
@@ -296,7 +312,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   textStyle: monoBase,
                 ),
                 _SummaryRow(
-                  label: 'tax_rate'.tr.replaceAll('@tax', order.tax.toStringAsFixed(0)),
+                  label: 'tax_rate'.tr.replaceAll(
+                    '@tax',
+                    order.tax.toStringAsFixed(0),
+                  ),
                   value:
                       '$currencyCode ${_currencyFormat.format(order.taxPrice)}',
                   textStyle: monoBase,
@@ -356,6 +375,19 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   textAlign: TextAlign.center,
                   style: monoBase?.copyWith(color: Colors.black54),
                 ),
+                const SizedBox(height: 16),
+                const _PerforatedDivider(),
+                const SizedBox(height: 12),
+                Center(
+                  child: bw.BarcodeWidget(
+                    barcode: bw.Barcode.code128(),
+                    data: order.invoiceNumber,
+                    width: 220,
+                    height: 60,
+                    drawText: true,
+                    style: monoBase?.copyWith(fontSize: 11),
+                  ),
+                ),
               ],
             ),
           ),
@@ -366,7 +398,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   Widget _buildItemRow(BuildContext context, OrderProduct item) {
     final itemTotal = item.price * item.quantity;
-    final title = item.productName ?? 'product_id_fallback'.tr.replaceAll('@id', item.productId.toString());
+    final title =
+        item.productName ??
+        'product_id_fallback'.tr.replaceAll('@id', item.productId.toString());
     final subtitleParts = <String>[];
 
     if ((item.variantName ?? '').trim().isNotEmpty) {
@@ -484,8 +518,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       final settings = _settingsController.settings.value;
       final items = await _itemsFuture;
 
-      final currencyCode =
-          _displayText(settings?.currencyCode, fallback: 'MMK');
+      final currencyCode = _displayText(
+        settings?.currencyCode,
+        fallback: 'MMK',
+      );
 
       // ── Build the receipt item list ──
       final receiptItems = items.map((item) {
@@ -518,10 +554,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         }
 
         return ReceiptItem(
-          name: item.productName ??
-              'product_id_fallback'
-                  .tr
-                  .replaceAll('@id', item.productId.toString()),
+          name:
+              item.productName ??
+              'product_id_fallback'.tr.replaceAll(
+                '@id',
+                item.productId.toString(),
+              ),
           variant: (item.variantName ?? '').trim().isEmpty
               ? null
               : item.variantName!.trim(),
@@ -563,8 +601,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         items: receiptItems,
         subTotal: _currencyFormat.format(order.subTotal),
         deliveryFees: _currencyFormat.format(order.deliveryFees),
-        taxLabel:
-            'tax_rate'.tr.replaceAll('@tax', order.tax.toStringAsFixed(0)),
+        taxLabel: 'tax_rate'.tr.replaceAll(
+          '@tax',
+          order.tax.toStringAsFixed(0),
+        ),
         taxPrice: _currencyFormat.format(order.taxPrice),
         totalPrice: _currencyFormat.format(order.totalPrice),
         givenAmount: _currencyFormat.format(order.givenAmount),
@@ -588,12 +628,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       );
 
       // ── Capture to raw RGBA pixels ──
-      final Uint8List imageBytes =
-          await _screenshotController.captureFromLongWidget(
-        receiptWidget,
-        pixelRatio: 1.0,
-        delay: const Duration(milliseconds: 100),
-      );
+      final Uint8List imageBytes = await _screenshotController
+          .captureFromLongWidget(
+            receiptWidget,
+            pixelRatio: 1.0,
+            delay: const Duration(milliseconds: 100),
+          );
 
       if (imageBytes.isEmpty) {
         throw Exception('Screenshot capture returned empty data');

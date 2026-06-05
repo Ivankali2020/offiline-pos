@@ -56,7 +56,7 @@ Future<List<int>> compileReceiptPayload(Uint8List pngBytes) async {
   // ── 5. Feed + partial cut ─────────────────────────────────────────────
   // Feed a few lines so the cut lands below the printed content, then
   // issue a partial-cut command (leaves a small strip attached).
-  payload.addAll(generator.feed(4));
+  payload.addAll(generator.feed(1));
   payload.addAll(generator.cut(mode: PosCutMode.partial));
 
   return payload;

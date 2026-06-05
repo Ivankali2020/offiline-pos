@@ -6,6 +6,8 @@ import 'package:abpos/pages/cart/product_picker_page.dart';
 import 'package:abpos/pages/cart/sale_details_page.dart';
 import 'package:abpos/pages/cart/checkout_page.dart';
 import 'package:abpos/pages/order/order_history_page.dart';
+import 'package:abpos/pages/order_return/order_return_page.dart';
+import 'package:abpos/pages/order_return/order_return_form_page.dart';
 import 'package:abpos/pages/purchase/purchase_create_page.dart';
 import 'package:abpos/pages/purchase/purchase_history_page.dart';
 import 'package:abpos/pages/purchase/purchase_product_picker_page.dart';
@@ -45,6 +47,8 @@ abstract class AppPages {
     ),
     GetPage(name: AppRoutes.checkout, page: () => const CheckoutPage()),
     GetPage(name: AppRoutes.orders, page: () => const OrderHistoryPage()),
+    GetPage(name: AppRoutes.orderReturns, page: () => const OrderReturnPage()),
+    GetPage(name: AppRoutes.orderReturnCreate, page: () => const OrderReturnFormPage()),
     GetPage(name: AppRoutes.purchases, page: () => const PurchaseHistoryPage()),
     GetPage(
       name: AppRoutes.purchaseCreate,

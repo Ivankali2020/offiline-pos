@@ -13,6 +13,7 @@ import 'package:abpos/controllers/purchase_controller.dart';
 import 'package:abpos/controllers/settings_controller.dart';
 import 'package:abpos/controllers/supplier_controller.dart';
 import 'package:abpos/controllers/printer_controller.dart';
+import 'package:abpos/controllers/order_return_controller.dart';
 import 'package:get/get.dart';
 
 class AppRefreshService {
@@ -40,6 +41,9 @@ class AppRefreshService {
     }
     if (Get.isRegistered<OrderController>()) {
       futures.add(Get.find<OrderController>().loadOrders());
+    }
+    if (Get.isRegistered<OrderReturnController>()) {
+      futures.add(Get.find<OrderReturnController>().loadReturns());
     }
     if (Get.isRegistered<PurchaseController>()) {
       futures.add(Get.find<PurchaseController>().loadPurchases());

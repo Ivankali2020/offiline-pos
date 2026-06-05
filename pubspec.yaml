@@ -54,6 +54,7 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_localizations:
     sdk: flutter
+  barcode_widget: ^2.0.4
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:barcode_widget/barcode_widget.dart' as bw;
 import 'package:flutter/material.dart';
 
 /// Data class representing a single line item on the printed receipt.
@@ -257,7 +258,11 @@ class ThermalReceiptWidget extends StatelessWidget {
             _summaryRow(labelDelivery, '$currencyCode $deliveryFees'),
             _summaryRow(taxLabel, '$currencyCode $taxPrice'),
             const SizedBox(height: 2),
-            _summaryRow(labelTotal, '$currencyCode $totalPrice', emphasis: true),
+            _summaryRow(
+              labelTotal,
+              '$currencyCode $totalPrice',
+              emphasis: true,
+            ),
             const SizedBox(height: 2),
             _summaryRow(labelPaid, '$currencyCode $givenAmount'),
             _summaryRow(labelChange, '$currencyCode $changeAmount'),
@@ -276,6 +281,21 @@ class ThermalReceiptWidget extends StatelessWidget {
             _centeredText(labelThankYou, _footerStyle),
             const SizedBox(height: 2),
             _centeredText(receiptFooter, _headerSub),
+
+            // ── Barcode ──
+            _divider(),
+            const SizedBox(height: 4),
+            Center(
+              child: bw.BarcodeWidget(
+                barcode: bw.Barcode.code128(),
+                data: invoiceNumber,
+                width: 400,
+                height: 80,
+                drawText: true,
+                style: _base.copyWith(fontSize: 18),
+              ),
+            ),
+            const SizedBox(height: 4),
           ],
         ),
       ),
@@ -308,10 +328,7 @@ class ThermalReceiptWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                '$currencyCode ${_fmt(item.lineTotal)}',
-                style: _itemName,
-              ),
+              Text('$currencyCode ${_fmt(item.lineTotal)}', style: _itemName),
             ],
           ),
 

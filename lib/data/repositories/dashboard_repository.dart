@@ -75,6 +75,17 @@ class DashboardRepository {
     return double.tryParse(result.first['total'].toString()) ?? 0.0;
   }
 
+  Future<double> totalReturnAmount() async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
+      'SELECT IFNULL(SUM(total_refund_amount), 0) AS total FROM order_return_products WHERE is_restocked = 0',
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
+
   Future<int> itemsInStock() async {
     final db = await DBProvider.instance.database;
     final result = await db.rawQuery(
