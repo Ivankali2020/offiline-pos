@@ -1,4 +1,5 @@
 import 'package:abpos/controllers/settings_controller.dart';
+import 'package:abpos/controllers/update_controller.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -254,9 +255,107 @@ class _AppDrawer extends StatelessWidget {
               Icons.upload_file_rounded,
             ),
             buildItem('settings'.tr, AppRoutes.settings, LucideIcons.settings),
+            const SizedBox(height: 8),
+            _buildUpdateItem(context, theme),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildUpdateItem(BuildContext context, ThemeData theme) {
+    final updateController = Get.find<UpdateController>();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Obx(() {
+        final hasUpdate = updateController.updateAvailable.value;
+        final isChecking = updateController.isChecking.value;
+
+        return Material(
+          color: hasUpdate
+              ? const Color(0xFF10B981).withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              Navigator.pop(context);
+              if (hasUpdate) {
+                updateController.showUpdateDialog();
+              } else {
+                updateController.checkForUpdate().then((_) {
+                  if (updateController.updateAvailable.value) {
+                    updateController.showUpdateDialog();
+                  }
+                });
+              }
+            },
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: hasUpdate
+                          ? const Color(0xFF10B981).withValues(alpha: 0.14)
+                          : Colors.black.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: isChecking
+                        ? const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            Icons.system_update_rounded,
+                            size: 17,
+                            color: hasUpdate
+                                ? const Color(0xFF10B981)
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.72),
+                          ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'check_for_update'.tr,
+                      style: TextStyle(
+                        color: hasUpdate
+                            ? const Color(0xFF10B981)
+                            : theme.colorScheme.onSurface
+                                .withValues(alpha: 0.72),
+                        fontWeight:
+                            hasUpdate ? FontWeight.w800 : FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  if (hasUpdate)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'new'.tr,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 

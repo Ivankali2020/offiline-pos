@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:abpos/controllers/settings_controller.dart';
+import 'package:abpos/controllers/update_controller.dart';
 import 'package:abpos/models/settings.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/app_bottom_sheet.dart';
@@ -342,9 +343,132 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () => Get.toNamed(AppRoutes.csvImport),
                 ),
               ),
+              const SizedBox(height: 16),
+              _buildUpdateCard(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildUpdateCard() {
+    final updateController = Get.find<UpdateController>();
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'app_update'.tr,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'app_update_subtitle'.tr,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: Colors.grey.shade600),
+                    ),
+                  ],
+                ),
+              ),
+              Obx(() {
+                if (updateController.updateAvailable.value) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color:
+                          const Color(0xFF10B981).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'update_available'.tr,
+                      style: const TextStyle(
+                        color: Color(0xFF10B981),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Obx(() => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: updateController.updateAvailable.value
+                        ? const Color(0xFF10B981).withValues(alpha: 0.12)
+                        : Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: updateController.isChecking.value
+                      ? const Padding(
+                          padding: EdgeInsets.all(10),
+                          child:
+                              CircularProgressIndicator(strokeWidth: 2.5),
+                        )
+                      : Icon(
+                          Icons.system_update_rounded,
+                          color: updateController.updateAvailable.value
+                              ? const Color(0xFF10B981)
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                ),
+                title: Text(
+                  'check_for_update'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                subtitle: Text(
+                  '${'current_version'.tr}: ${updateController.currentVersion.value}',
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () {
+                  if (updateController.updateAvailable.value) {
+                    updateController.showUpdateDialog();
+                  } else {
+                    updateController.checkForUpdate().then((_) {
+                      if (updateController.updateAvailable.value) {
+                        updateController.showUpdateDialog();
+                      }
+                    });
+                  }
+                },
+              )),
+        ],
       ),
     );
   }

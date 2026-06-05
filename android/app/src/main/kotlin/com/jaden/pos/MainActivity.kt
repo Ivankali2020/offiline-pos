@@ -1,4 +1,4 @@
-package com.example.abpos
+package com.jaden.pos
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -79,10 +79,10 @@ class _PrinterPageState extends State<PrinterPage> {
       body: Obx(() {
         final allPrinters = controller.printers.toList(growable: false);
         final printers = controller.filteredPrinters;
-        final defaultCount =
-            allPrinters.where((p) => p.isDefault).length;
-        final connectedCount =
-            allPrinters.where((p) => (p.address ?? '').trim().isNotEmpty).length;
+        // final defaultCount =
+        //     allPrinters.where((p) => p.isDefault).length;
+        // final connectedCount =
+        //     allPrinters.where((p) => (p.address ?? '').trim().isNotEmpty).length;
         final isSearching = controller.searchQuery.value.trim().isNotEmpty;
 
         if (allPrinters.isEmpty) {
@@ -709,133 +709,133 @@ class _TestPrintSheetState extends State<_TestPrintSheet> {
 // Overview Card
 // ──────────────────────────────────────────────────
 
-class _PrinterOverviewCard extends StatelessWidget {
-  const _PrinterOverviewCard({
-    required this.visibleCount,
-    required this.totalCount,
-    required this.defaultCount,
-    required this.connectedCount,
-  });
+// class _PrinterOverviewCard extends StatelessWidget {
+//   const _PrinterOverviewCard({
+//     required this.visibleCount,
+//     required this.totalCount,
+//     required this.defaultCount,
+//     required this.connectedCount,
+//   });
 
-  final int visibleCount;
-  final int totalCount;
-  final int defaultCount;
-  final int connectedCount;
+//   final int visibleCount;
+//   final int totalCount;
+//   final int defaultCount;
+//   final int connectedCount;
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF6366F1),
-            Color.alphaBlend(
-              Colors.white.withValues(alpha: 0.10),
-              const Color(0xFF6366F1),
-            ),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6366F1).withValues(alpha: 0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'printer_overview'.tr,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'printers_in_view'.tr.replaceAll('@count', '$visibleCount'),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.84),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _PrinterOverviewTile(
-                  label: 'total'.tr,
-                  value: '$totalCount',
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _PrinterOverviewTile(
-                  label: 'default'.tr,
-                  value: '$defaultCount',
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _PrinterOverviewTile(
-                  label: 'with_address'.tr,
-                  value: '$connectedCount',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(22),
+//         gradient: LinearGradient(
+//           colors: [
+//             const Color(0xFF6366F1),
+//             Color.alphaBlend(
+//               Colors.white.withValues(alpha: 0.10),
+//               const Color(0xFF6366F1),
+//             ),
+//           ],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         boxShadow: [
+//           BoxShadow(
+//             color: const Color(0xFF6366F1).withValues(alpha: 0.18),
+//             blurRadius: 18,
+//             offset: const Offset(0, 10),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             'printer_overview'.tr,
+//             style: theme.textTheme.titleLarge?.copyWith(
+//               color: Colors.white,
+//               fontWeight: FontWeight.w900,
+//             ),
+//           ),
+//           const SizedBox(height: 4),
+//           Text(
+//             'printers_in_view'.tr.replaceAll('@count', '$visibleCount'),
+//             style: theme.textTheme.bodyMedium?.copyWith(
+//               color: Colors.white.withValues(alpha: 0.84),
+//             ),
+//           ),
+//           const SizedBox(height: 16),
+//           Row(
+//             children: [
+//               Expanded(
+//                 child: _PrinterOverviewTile(
+//                   label: 'total'.tr,
+//                   value: '$totalCount',
+//                 ),
+//               ),
+//               const SizedBox(width: 10),
+//               Expanded(
+//                 child: _PrinterOverviewTile(
+//                   label: 'default'.tr,
+//                   value: '$defaultCount',
+//                 ),
+//               ),
+//               const SizedBox(width: 10),
+//               Expanded(
+//                 child: _PrinterOverviewTile(
+//                   label: 'with_address'.tr,
+//                   value: '$connectedCount',
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-class _PrinterOverviewTile extends StatelessWidget {
-  const _PrinterOverviewTile({required this.label, required this.value});
+// class _PrinterOverviewTile extends StatelessWidget {
+//   const _PrinterOverviewTile({required this.label, required this.value});
 
-  final String label;
-  final String value;
+//   final String label;
+//   final String value;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.13),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+//       decoration: BoxDecoration(
+//         color: Colors.white.withValues(alpha: 0.13),
+//         borderRadius: BorderRadius.circular(16),
+//         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             label,
+//             style: const TextStyle(
+//               color: Colors.white70,
+//               fontWeight: FontWeight.w600,
+//             ),
+//           ),
+//           const SizedBox(height: 6),
+//           Text(
+//             value,
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontSize: 18,
+//               fontWeight: FontWeight.w900,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 // ──────────────────────────────────────────────────
 // Printer Card
@@ -1188,7 +1188,7 @@ class _DefaultToggle extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF059669),
+            activeThumbColor: const Color(0xFF059669),
           ),
         ],
       ),
