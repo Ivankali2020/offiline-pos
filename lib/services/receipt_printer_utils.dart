@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
 
 /// Compiles a PNG-encoded `Uint8List` image (captured by the `screenshot`
