@@ -13,6 +13,7 @@ class Product {
   final double buyPrice;
   final bool hasVariant;
   final bool isActive;
+  final String? expiredDate;
   final String? createdAt;
   final String? updatedAt;
 
@@ -35,6 +36,7 @@ class Product {
     required this.buyPrice,
     required this.hasVariant,
     required this.isActive,
+    this.expiredDate,
     this.createdAt,
     this.updatedAt,
     this.categoryName,
@@ -57,6 +59,7 @@ class Product {
       buyPrice: (map['buy_price'] as num).toDouble(),
       hasVariant: (map['has_variant'] as int?) == 1,
       isActive: (map['is_active'] as int) == 1,
+      expiredDate: map['expired_date'] as String?,
       createdAt: map['created_at'] as String?,
       updatedAt: map['updated_at'] as String?,
       categoryName: map['category_name'] as String?,
@@ -80,6 +83,7 @@ class Product {
       'buy_price': buyPrice,
       'has_variant': hasVariant ? 1 : 0,
       'is_active': isActive ? 1 : 0,
+      'expired_date': expiredDate,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };

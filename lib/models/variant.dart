@@ -7,6 +7,7 @@ class Variant {
   final int stockQuantity;
   final double sellPrice;
   final double buyPrice;
+  final String? expiredDate;
   final String? createdAt;
   final String? updatedAt;
 
@@ -19,6 +20,7 @@ class Variant {
     required this.stockQuantity,
     required this.sellPrice,
     required this.buyPrice,
+    this.expiredDate,
     this.createdAt,
     this.updatedAt,
   });
@@ -33,6 +35,7 @@ class Variant {
       stockQuantity: map['stock_quantity'] as int,
       sellPrice: (map['sell_price'] as num).toDouble(),
       buyPrice: (map['buy_price'] as num).toDouble(),
+      expiredDate: map['expired_date'] as String?,
       createdAt: map['created_at'] as String?,
       updatedAt: map['updated_at'] as String?,
     );
@@ -48,6 +51,7 @@ class Variant {
       'stock_quantity': stockQuantity,
       'sell_price': sellPrice,
       'buy_price': buyPrice,
+      'expired_date': expiredDate,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
