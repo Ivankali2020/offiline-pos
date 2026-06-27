@@ -291,6 +291,7 @@ class DBProvider {
     );
     await _ensureLogTables(_database!);
     await _ensureExpenseTransactionType(_database!);
+    await _ensureExpiredDateColumns(_database!);
     return _database!;
   }
 
@@ -304,6 +305,19 @@ class DBProvider {
       await db.execute(
         "ALTER TABLE expanses ADD COLUMN transaction_type TEXT NOT NULL DEFAULT 'expense'",
       );
+    } catch (_) {
+      // Column already exists — safe to ignore
+    }
+  }
+
+  Future<void> _ensureExpiredDateColumns(Database db) async {
+    try {
+      await db.execute('ALTER TABLE products ADD COLUMN expired_date TEXT');
+    } catch (_) {
+      // Column already exists — safe to ignore
+    }
+    try {
+      await db.execute('ALTER TABLE variants ADD COLUMN expired_date TEXT');
     } catch (_) {
       // Column already exists — safe to ignore
     }

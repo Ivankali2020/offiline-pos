@@ -108,6 +108,7 @@ CREATE TABLE products (
   buy_price REAL NOT NULL DEFAULT 0,
   has_variant INTEGER NOT NULL DEFAULT 0,
   is_active INTEGER NOT NULL DEFAULT 1,
+  expired_date TEXT,
   created_at TEXT,
   updated_at TEXT,
   FOREIGN KEY (seller_id) REFERENCES sellers(id),
@@ -127,6 +128,7 @@ CREATE TABLE variants (
   stock_quantity INTEGER NOT NULL DEFAULT 0,
   sell_price REAL NOT NULL DEFAULT 0,
   buy_price REAL NOT NULL DEFAULT 0,
+  expired_date TEXT,
   created_at TEXT,
   updated_at TEXT,
   FOREIGN KEY (product_id) REFERENCES products(id)

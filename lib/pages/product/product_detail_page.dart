@@ -339,6 +339,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ),
                         ],
                       ),
+                      if (_product.expiredDate != null &&
+                          _product.expiredDate!.trim().isNotEmpty) ...[
+                        const Gap(14),
+                        _ReadOnlyField(
+                          label: 'expired_date'.tr,
+                          value: _product.expiredDate!,
+                          suffixIcon: const Icon(LucideIcons.calendarClock, size: 18, color: Colors.black45),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -461,6 +470,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                           LucideIcons.badgeDollarSign,
                                           '${'price'.tr}: ${v.sellPrice.toStringAsFixed(0)}',
                                         ),
+                                        if (v.expiredDate != null &&
+                                            v.expiredDate!.isNotEmpty)
+                                          _buildVariantChip(
+                                            LucideIcons.calendarClock,
+                                            '${'expired_date'.tr}: ${v.expiredDate}',
+                                          ),
                                       ],
                                     ),
                                   ],

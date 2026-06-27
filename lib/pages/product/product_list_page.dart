@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:abpos/controllers/product_controller.dart';
 import 'package:abpos/pages/product/product_filter_bottom_sheet.dart';
@@ -383,7 +384,16 @@ class _ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStockBadge(context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStockBadge(context),
+                  if (product.expiredDate != null &&
+                      product.expiredDate!.isNotEmpty)
+                    _buildExpiryBadge(context),
+                ],
+              ),
               const SizedBox(height: 8),
               Text(
                 product.name,
@@ -529,6 +539,45 @@ class _ProductCard extends StatelessWidget {
       ),
       child: Text(
         '${'stock'.tr}: ${product.stockQuantity}',
+        style: TextStyle(
+          color: color,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpiryBadge(BuildContext context) {
+    final expiry = DateTime.tryParse(product.expiredDate!.trim());
+    if (expiry == null) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final expiryDay = DateTime(expiry.year, expiry.month, expiry.day);
+    final diff = expiryDay.difference(today).inDays;
+
+    String label;
+    Color color;
+    if (diff < 0) {
+      label = 'expired'.tr;
+      color = Colors.red;
+    } else if (diff <= 30) {
+      label = 'expiring_soon'.tr;
+      color = Colors.orange;
+    } else {
+      label = DateFormat('yyyy-MM-dd').format(expiry);
+      color = Colors.blueGrey;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
         style: TextStyle(
           color: color,
           fontSize: 9,

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:abpos/controllers/product_controller.dart';
 import 'package:abpos/controllers/brand_controller.dart';
@@ -310,6 +311,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
   final TextEditingController _stockQuantityController = TextEditingController(
     text: '0',
   );
+  final TextEditingController _expiredDateController = TextEditingController();
 
   final RxList<Variant> _variants = <Variant>[].obs;
   final List<_ProductAttributeDraft> _attributeDrafts = [];
@@ -355,6 +357,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _sellPriceController.text = p.sellPrice.toStringAsFixed(0);
     _buyPriceController.text = p.buyPrice.toStringAsFixed(0);
     _stockQuantityController.text = p.stockQuantity.toString();
+    _expiredDateController.text = p.expiredDate ?? '';
 
     if (!mounted) return;
     setState(() {
@@ -456,6 +459,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _sellPriceController.dispose();
     _buyPriceController.dispose();
     _stockQuantityController.dispose();
+    _expiredDateController.dispose();
     super.dispose();
   }
 
@@ -536,7 +540,36 @@ class _ProductFormPageState extends State<ProductFormPage> {
         ],
       ),
       const Gap(24),
+      CustomTextField(
+        controller: _expiredDateController,
+        label: 'expired_date'.tr,
+        readOnly: true,
+        onTap: () => _pickDate(_expiredDateController),
+        suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+      ),
+      const Gap(24),
     ];
+  }
+
+  Future<void> _pickDate(TextEditingController controller) async {
+    final now = DateTime.now();
+    final initial = _parseDate(controller.text) ?? now;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(now.year - 10),
+      lastDate: DateTime(now.year + 20),
+    );
+    if (picked != null) {
+      setState(
+        () => controller.text = DateFormat('yyyy-MM-dd').format(picked),
+      );
+    }
+  }
+
+  DateTime? _parseDate(String value) {
+    if (value.trim().isEmpty) return null;
+    return DateTime.tryParse(value.trim());
   }
 
   void _showVariantDialog({Variant? variant, int? index}) {
@@ -551,6 +584,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
     );
     final buyPriceCtrl = TextEditingController(
       text: variant?.buyPrice.toStringAsFixed(0) ?? '0',
+    );
+    final expiredDateCtrl = TextEditingController(
+      text: variant?.expiredDate ?? '',
     );
     final attributeDrafts = <_ProductAttributeDraft>[];
     var isLoadingAttributes = variant?.attributes?.trim().isNotEmpty == true;
@@ -660,6 +696,29 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     keyboardType: TextInputType.number,
                     validator: _requiredNumberValidator,
                   ),
+                  const Gap(14),
+                  CustomTextField(
+                    controller: expiredDateCtrl,
+                    label: 'expired_date'.tr,
+                    readOnly: true,
+                    onTap: () async {
+                      final now = DateTime.now();
+                      final initial = _parseDate(expiredDateCtrl.text) ?? now;
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: initial,
+                        firstDate: DateTime(now.year - 10),
+                        lastDate: DateTime(now.year + 20),
+                      );
+                      if (picked != null) {
+                        setSheetState(
+                          () => expiredDateCtrl.text =
+                              DateFormat('yyyy-MM-dd').format(picked),
+                        );
+                      }
+                    },
+                    suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+                  ),
                   const Gap(20),
                   FormActionButtons(
                     confirmLabel: variant == null ? 'add'.tr : 'save'.tr,
@@ -681,6 +740,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
                             0,
                         buyPrice:
                             double.tryParse(buyPriceCtrl.text) ?? 0,
+                        expiredDate: expiredDateCtrl.text.trim().isEmpty
+                            ? null
+                            : expiredDateCtrl.text.trim(),
                       );
 
                       if (index != null) {
@@ -736,6 +798,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
           : (double.tryParse(_buyPriceController.text) ?? 0),
       hasVariant: _hasVariant,
       isActive: true,
+      expiredDate: _expiredDateController.text.trim().isEmpty
+          ? null
+          : _expiredDateController.text.trim(),
     );
 
     try {
@@ -753,6 +818,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 stockQuantity: variant.stockQuantity,
                 sellPrice: variant.sellPrice,
                 buyPrice: variant.buyPrice,
+                expiredDate: variant.expiredDate,
               ),
             );
           }
@@ -785,6 +851,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 stockQuantity: variant.stockQuantity,
                 sellPrice: variant.sellPrice,
                 buyPrice: variant.buyPrice,
+                expiredDate: variant.expiredDate,
               ),
             );
           }
@@ -1395,6 +1462,12 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                         LucideIcons.badgeDollarSign,
                                         '${'price'.tr}: ${v.sellPrice.toStringAsFixed(0)}',
                                       ),
+                                      if (v.expiredDate != null &&
+                                          v.expiredDate!.isNotEmpty)
+                                        _buildVariantChip(
+                                          LucideIcons.calendarClock,
+                                          '${'expired_date'.tr}: ${v.expiredDate}',
+                                        ),
                                     ],
                                   ),
                                 ],
