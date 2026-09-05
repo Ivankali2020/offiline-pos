@@ -22,19 +22,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-
-      - name: Set Gradle distribution URL
-        run: |
-          mkdir -p ~/.gradle
-          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.7.1-all.zip|' android/gradle/wrapper/gradle-wrapper.properties
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
