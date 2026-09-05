@@ -461,9 +461,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     updateController.showUpdateDialog();
                   } else {
                     updateController.checkForUpdate().then((_) {
-                      if (updateController.updateAvailable.value) {
-                        updateController.showUpdateDialog();
-                      }
+                      updateController.showUpdateDialog();
                     });
                   }
                 },

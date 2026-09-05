@@ -65,17 +65,24 @@ class UpdateService {
   // ---------------------------------------------------------------------------
 
   /// Fetches the latest release from GitHub. Returns `null` on failure.
-  static Future<ReleaseInfo?> fetchLatestRelease() async {
+  /// Sets [error] with a reason if the call fails.
+  static Future<ReleaseInfo?> fetchLatestRelease({StringSink? error}) async {
     try {
       final response = await http.get(
         Uri.parse(_releasesUrl),
         headers: {'Accept': 'application/vnd.github.v3+json'},
       );
 
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        error?.write('HTTP ${response.statusCode}');
+        return null;
+      }
 
       final List<dynamic> releases = json.decode(response.body);
-      if (releases.isEmpty) return null;
+      if (releases.isEmpty) {
+        error?.write('no_releases');
+        return null;
+      }
 
       final latest = releases.first as Map<String, dynamic>;
       final assets = latest['assets'] as List<dynamic>? ?? [];
@@ -90,7 +97,10 @@ class UpdateService {
         }
       }
 
-      if (apkUrl == null) return null;
+      if (apkUrl == null) {
+        error?.write('no_apk_asset');
+        return null;
+      }
 
       final tagName = latest['tag_name'] as String? ?? '';
       return ReleaseInfo(
@@ -101,7 +111,8 @@ class UpdateService {
         apkDownloadUrl: apkUrl,
         htmlUrl: latest['html_url'] as String? ?? '',
       );
-    } catch (_) {
+    } catch (e) {
+      error?.write(e.toString());
       return null;
     }
   }

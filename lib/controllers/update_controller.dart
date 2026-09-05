@@ -62,10 +62,20 @@ class UpdateController extends GetxController {
     isChecking.value = true;
 
     try {
-      final release = await UpdateService.fetchLatestRelease();
+      final errorBuf = StringBuffer();
+      final release = await UpdateService.fetchLatestRelease(error: errorBuf);
       if (release == null) {
         if (!silent) {
-          errorMessage.value = 'update_check_failed'.tr;
+          final reason = errorBuf.toString();
+          if (reason == 'no_apk_asset') {
+            errorMessage.value = 'no_apk_in_release'.tr;
+          } else if (reason == 'no_releases') {
+            errorMessage.value = 'no_releases_found'.tr;
+          } else if (reason.isNotEmpty) {
+            errorMessage.value = '${'update_check_failed'.tr} ($reason)';
+          } else {
+            errorMessage.value = 'update_check_failed'.tr;
+          }
         }
         isChecking.value = false;
         return;
