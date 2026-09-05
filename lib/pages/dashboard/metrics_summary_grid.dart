@@ -15,7 +15,7 @@ class MetricsSummaryGrid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth < 680 ? 3 : 3;
+        final columns = constraints.maxWidth < 480 ? 1 : 3;
         const gap = 12.0;
         final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
         final cards = [
