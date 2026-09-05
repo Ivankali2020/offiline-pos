@@ -182,4 +182,45 @@ class DashboardRepository {
     final day = value.day.toString().padLeft(2, '0');
     return '$year-$month-$day';
   }
+
+  Future<double> totalSalesByDateRange(DateTime start, DateTime end) async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
+      'SELECT IFNULL(SUM(total_price), 0) AS total FROM orders WHERE substr(created_at, 1, 10) >= ? AND substr(created_at, 1, 10) <= ?',
+      [_formatSqlDate(start), _formatSqlDate(end)],
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
+
+  Future<double> totalProfitByDateRange(DateTime start, DateTime end) async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
+      '''
+      SELECT IFNULL(SUM(op.profit), 0) AS total
+      FROM order_products op
+      JOIN orders o ON op.order_id = o.id
+      WHERE substr(o.created_at, 1, 10) >= ? AND substr(o.created_at, 1, 10) <= ?
+      ''',
+      [_formatSqlDate(start), _formatSqlDate(end)],
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
+
+  Future<double> totalExpensesByDateRange(DateTime start, DateTime end) async {
+    final db = await DBProvider.instance.database;
+    final result = await db.rawQuery(
+      "SELECT IFNULL(SUM(amount), 0) AS total FROM expanses WHERE transaction_type = 'expense' AND substr(created_at, 1, 10) >= ? AND substr(created_at, 1, 10) <= ?",
+      [_formatSqlDate(start), _formatSqlDate(end)],
+    );
+    if (result.isEmpty || result.first['total'] == null) {
+      return 0.0;
+    }
+    return double.tryParse(result.first['total'].toString()) ?? 0.0;
+  }
 }

@@ -26,4 +26,5 @@ abstract class AppRoutes {
   static const expenseCategories = '/expense-categories';
   static const csvImport = '/csv-import';
   static const printers = '/printers';
+  static const overview = '/overview';
 }

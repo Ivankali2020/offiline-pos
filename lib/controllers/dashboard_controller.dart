@@ -21,6 +21,10 @@ class DashboardController extends GetxController {
   final Rxn<DashboardDateFilterPreset> chartSelectedPreset =
       Rxn<DashboardDateFilterPreset>();
 
+  final RxDouble filteredSales = 0.0.obs;
+  final RxDouble filteredProfit = 0.0.obs;
+  final RxDouble filteredExpenses = 0.0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -50,6 +54,41 @@ class DashboardController extends GetxController {
     totalProducts.value = results[5] as int;
     totalCapital.value = results[6] as double;
     totalAllExpenses.value = results[7] as double;
+
+    await loadFilteredMetrics();
+  }
+
+  Future<void> loadFilteredMetrics() async {
+    final startDate = chartStartDate.value;
+    final endDate = chartEndDate.value;
+
+    DateTime start;
+    DateTime end;
+
+    if (startDate != null && endDate != null) {
+      start = DateTime(startDate.year, startDate.month, startDate.day);
+      end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+    } else if (startDate != null) {
+      start = DateTime(startDate.year, startDate.month, startDate.day);
+      end = DateTime(start.year, start.month, start.day, 23, 59, 59);
+    } else if (endDate != null) {
+      start = DateTime(endDate.year, endDate.month, endDate.day);
+      end = DateTime(start.year, start.month, start.day, 23, 59, 59);
+    } else {
+      final now = DateTime.now();
+      start = DateTime(now.year, now.month, 1);
+      end = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+    }
+
+    final results = await Future.wait<dynamic>([
+      _repository.totalSalesByDateRange(start, end),
+      _repository.totalProfitByDateRange(start, end),
+      _repository.totalExpensesByDateRange(start, end),
+    ]);
+
+    filteredSales.value = results[0] as double;
+    filteredProfit.value = results[1] as double;
+    filteredExpenses.value = results[2] as double;
   }
 
   double get actualProfit => totalProfit.value - (totalExpenses.value + totalCapital.value);
@@ -107,7 +146,10 @@ class DashboardController extends GetxController {
 
   Future<void> applyChartDatePreset(DashboardDateFilterPreset preset) async {
     _setChartDatePreset(preset);
-    await loadChartData();
+    await Future.wait([
+      loadChartData(),
+      loadFilteredMetrics(),
+    ]);
   }
 
   Future<void> setCustomChartDateRange(DateTime? start, DateTime? end) async {
@@ -120,14 +162,20 @@ class DashboardController extends GetxController {
     chartSelectedPreset.value = start == null && end == null
         ? null
         : DashboardDateFilterPreset.custom;
-    await loadChartData();
+    await Future.wait([
+      loadChartData(),
+      loadFilteredMetrics(),
+    ]);
   }
 
   Future<void> clearChartFilter() async {
     chartStartDate.value = null;
     chartEndDate.value = null;
     chartSelectedPreset.value = null;
-    await loadChartData();
+    await Future.wait([
+      loadChartData(),
+      loadFilteredMetrics(),
+    ]);
   }
 
   int get chartActiveFilterCount {

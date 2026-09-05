@@ -194,6 +194,11 @@ class _AppDrawer extends StatelessWidget {
               LucideIcons.layoutDashboard,
             ),
             buildItem(
+              'overview'.tr,
+              AppRoutes.overview,
+              LucideIcons.barChart3,
+            ),
+            buildItem(
               'new_sale'.tr,
               AppRoutes.saleDetails,
               LucideIcons.shoppingCart,

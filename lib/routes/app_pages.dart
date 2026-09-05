@@ -27,6 +27,7 @@ import 'package:abpos/pages/expense/expense_page.dart';
 import 'package:abpos/pages/settings/backup_page.dart';
 import 'package:abpos/pages/settings/import_page.dart';
 import 'package:abpos/pages/manage/printer_page.dart';
+import 'package:abpos/pages/dashboard/overview_page.dart';
 
 abstract class AppPages {
   static const initial = AppRoutes.dashboard;
@@ -80,5 +81,6 @@ abstract class AppPages {
     ),
     GetPage(name: AppRoutes.csvImport, page: () => const ImportPage()),
     GetPage(name: AppRoutes.printers, page: () => const PrinterPage()),
+    GetPage(name: AppRoutes.overview, page: () => const OverviewPage()),
   ];
 }
