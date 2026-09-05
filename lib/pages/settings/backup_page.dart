@@ -181,11 +181,11 @@ class _BackupPageState extends State<BackupPage> {
 
     if (confirmed != true) return;
 
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['db'],
     );
-    final selectedPath = result?.files.single.path;
+    final selectedPath = file?.path;
     if (selectedPath == null || selectedPath.trim().isEmpty) return;
 
     try {

@@ -190,11 +190,11 @@ class ImportController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> runImport(ImportType type) async {
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
-    final path = result?.files.single.path;
+    final path = file?.path;
     if (path == null || path.trim().isEmpty) return;
 
     isBusy.value = true;
