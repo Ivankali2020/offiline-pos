@@ -400,12 +400,6 @@ class _OrderHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final customerLabel = order.customerName?.trim().isNotEmpty == true
-        ? order.customerName!.trim()
-        : 'walk_in_customer'.tr;
-    final phoneLabel = order.customerPhone?.trim().isNotEmpty == true
-        ? order.customerPhone!.trim()
-        : 'no_phone'.tr;
     final paidLabel = 'paid_amount'.tr.replaceAll('@amount', currencyFormat.format(order.givenAmount));
 
     return Material(
@@ -477,11 +471,16 @@ class _OrderHistoryCard extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _MetaPill(
-                      icon: Icons.person_outline_rounded,
-                      label: customerLabel,
-                    ),
-                    _MetaPill(icon: Icons.phone_outlined, label: phoneLabel),
+                    if (order.customerName?.trim().isNotEmpty == true)
+                      _MetaPill(
+                        icon: Icons.person_outline_rounded,
+                        label: order.customerName!.trim(),
+                      ),
+                    if (order.customerPhone?.trim().isNotEmpty == true)
+                      _MetaPill(
+                        icon: Icons.phone_outlined,
+                        label: order.customerPhone!.trim(),
+                      ),
                     _MetaPill(icon: Icons.payments_outlined, label: paidLabel),
                   ],
                 ),

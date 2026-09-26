@@ -90,10 +90,10 @@ class OrderReturnRepository {
           final currentQty = (opFirst['quantity'] as num?)?.toInt() ?? 0;
           final newQty = currentQty - product.quantity;
 
-          final opProfit = (opFirst['profit'] as num?)?.toDouble() ?? 0.0;
-          final unitProfit = currentQty > 0 ? (opProfit / currentQty) : 0.0;
-          final profitDelta = unitProfit * product.quantity;
-          final newProfit = (opProfit - profitDelta) < 0 ? 0.0 : (opProfit - profitDelta);
+          final opPrice = (opFirst['price'] as num?)?.toDouble() ?? 0.0;
+          final opBuyPrice = (opFirst['original_buy_price'] as num?)?.toDouble() ?? 0.0;
+          final unitProfit = opPrice - opBuyPrice;
+          final newProfit = unitProfit * (newQty < 0 ? 0 : newQty);
 
           await txn.update(
             'order_products',
@@ -157,10 +157,10 @@ class OrderReturnRepository {
             final currentQty = (opFirst['quantity'] as num?)?.toInt() ?? 0;
             final qty = rp['quantity'] as int;
 
-            final opProfit = (opFirst['profit'] as num?)?.toDouble() ?? 0.0;
-            final unitProfit = currentQty > 0 ? (opProfit / currentQty) : 0.0;
-            final profitDelta = unitProfit * qty;
-            final newProfit = opProfit + profitDelta;
+            final opPrice = (opFirst['price'] as num?)?.toDouble() ?? 0.0;
+            final opBuyPrice = (opFirst['original_buy_price'] as num?)?.toDouble() ?? 0.0;
+            final unitProfit = opPrice - opBuyPrice;
+            final newProfit = unitProfit * (currentQty + qty);
 
             await txn.update(
               'order_products',

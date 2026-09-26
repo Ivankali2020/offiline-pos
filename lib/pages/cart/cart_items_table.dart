@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:abpos/controllers/cart_controller.dart';
+import 'package:abpos/controllers/product_controller.dart';
 import 'package:intl/intl.dart';
 
 class CartItemsTable extends StatelessWidget {
@@ -85,6 +86,12 @@ class CartItemsTable extends StatelessWidget {
                 final index = entry.key;
                 final item = entry.value;
                 final isLast = index == controller.items.length - 1;
+                final productController = Get.find<ProductController>();
+                final product = productController.products.firstWhereOrNull(
+                  (p) => p.id == item.productId,
+                );
+                final maxQty = product?.stockQuantity;
+                final atMax = maxQty != null && item.quantity >= maxQty;
 
                 return Container(
                   padding: const EdgeInsets.symmetric(
@@ -149,13 +156,15 @@ class CartItemsTable extends StatelessWidget {
                             IconButton(
                               visualDensity: VisualDensity.compact,
                               padding: EdgeInsets.zero,
-                              icon: const Icon(
+                              icon: Icon(
                                 LucideIcons.plusCircle,
                                 size: 16,
-                                color: Colors.blue,
+                                color: atMax ? Colors.grey : Colors.blue,
                               ),
-                              onPressed: () =>
-                                  controller.updateQuantity(index, 1),
+                              onPressed: atMax
+                                  ? null
+                                  : () =>
+                                      controller.updateQuantity(index, 1),
                             ),
                           ],
                         ),

@@ -270,6 +270,33 @@ class DBProvider {
     });
   }
 
+  Future<int> fixProfitColumn() async {
+    final db = await database;
+    final rows = await db.rawQuery(
+      'SELECT id, price, original_buy_price, quantity, profit FROM order_products',
+    );
+
+    int updated = 0;
+    for (final row in rows) {
+      final price = (row['price'] as num?)?.toDouble() ?? 0.0;
+      final buyPrice = (row['original_buy_price'] as num?)?.toDouble() ?? 0.0;
+      final quantity = (row['quantity'] as num?)?.toInt() ?? 1;
+      final currentProfit = (row['profit'] as num?)?.toDouble() ?? 0.0;
+      final correctProfit = (price - buyPrice) * quantity;
+
+      if ((currentProfit - correctProfit).abs() > 0.01) {
+        await db.update(
+          'order_products',
+          {'profit': correctProfit},
+          where: 'id = ?',
+          whereArgs: [row['id']],
+        );
+        updated++;
+      }
+    }
+    return updated;
+  }
+
   Future<void> close() async {
     final db = _database;
     if (db != null) {

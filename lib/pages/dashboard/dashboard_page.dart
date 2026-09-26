@@ -28,10 +28,15 @@ class DashboardPage extends StatelessWidget {
         leadingIcon: LucideIcons.settings,
         showDrawerButton: true,
         actions: [
-          TextButton.icon(
+          IconButton(
+            onPressed: () => _confirmFixProfit(context),
+            icon: const Icon(Icons.calculate_rounded, size: 20),
+            tooltip: 'adjust_profit'.tr,
+          ),
+          IconButton(
             onPressed: () => _confirmTestSeedReset(context),
-            icon: const Icon(Icons.storage_rounded, size: 18),
-            label: Text('test_seed'.tr),
+            icon: const Icon(Icons.storage_rounded, size: 20),
+            tooltip: 'test_seed'.tr,
           ),
         ],
       ),
@@ -113,6 +118,35 @@ class DashboardPage extends StatelessWidget {
         }
         return 'until_date'.trParams({'date': formatter.format(end!)});
     }
+  }
+
+  Future<void> _confirmFixProfit(BuildContext context) async {
+    final confirmed = await Get.dialog<bool>(
+      AlertDialog(
+        title: Text('adjust_profit_title'.tr),
+        content: Text('adjust_profit_content'.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text('cancel'.tr),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            child: Text('adjust_profit'.tr),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final updated = await DBProvider.instance.fixProfitColumn();
+    await AppRefreshService.refreshAll();
+    Get.snackbar(
+      'adjust_profit_complete'.tr,
+      'adjust_profit_success'.trParams({'count': '$updated'}),
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   Future<void> _confirmTestSeedReset(BuildContext context) async {

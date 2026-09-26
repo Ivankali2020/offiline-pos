@@ -204,6 +204,7 @@ class _AppDrawer extends StatelessWidget {
               LucideIcons.shoppingCart,
             ),
             buildItem('orders'.tr, AppRoutes.orders, LucideIcons.history),
+            buildItem('order_products'.tr, AppRoutes.orderProducts, LucideIcons.listTree),
             buildSectionLabel('catalog'.tr),
             buildItem(
               'products'.tr,

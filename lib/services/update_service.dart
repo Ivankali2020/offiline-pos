@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 /// Holds information about a GitHub release.
 class ReleaseInfo {
   final String tagName;
@@ -130,7 +131,7 @@ class UpdateService {
   // Download
   // ---------------------------------------------------------------------------
 
-  /// Downloads the APK from [url] into the app's external cache directory.
+  /// Downloads the APK from [url] into the app's external storage directory.
   /// Calls [onProgress] with values from 0.0 to 1.0.
   static Future<String?> downloadApk(
     String url, {
@@ -141,7 +142,17 @@ class UpdateService {
       final streamed = await http.Client().send(request);
 
       final contentLength = streamed.contentLength ?? 0;
-      final dir = await getTemporaryDirectory();
+
+      // Use external storage so Android package installer can access the file.
+      // Falls back to app documents dir if external storage is unavailable.
+      Directory? dir;
+      try {
+        dir = await getExternalStorageDirectory();
+      } catch (_) {
+        dir = null;
+      }
+      dir ??= await getApplicationDocumentsDirectory();
+
       final filePath = '${dir.path}/abpos_update.apk';
       final file = File(filePath);
       final sink = file.openWrite();

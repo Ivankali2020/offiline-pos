@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:abpos/models/order_product.dart';
 import 'package:abpos/models/product.dart';
 import 'package:abpos/controllers/settings_controller.dart';
+import 'package:abpos/controllers/product_controller.dart';
 import 'package:intl/intl.dart';
 
 class CartController extends GetxController {
@@ -52,7 +53,7 @@ class CartController extends GetxController {
         discountPrice: existing.discountPrice,
         discount: existing.discount,
         quantity: existing.quantity + item.quantity,
-        profit: existing.profit,
+        profit: existing.profit + item.profit,
         originalBuyPrice: existing.originalBuyPrice,
         originalPrice: existing.originalPrice,
         totalRefundedAmount: existing.totalRefundedAmount,
@@ -77,7 +78,7 @@ class CartController extends GetxController {
       discountPrice: product.sellPrice,
       discount: 0,
       quantity: quantity,
-      profit: (product.sellPrice - product.buyPrice),
+      profit: (product.sellPrice - product.buyPrice) * quantity,
       originalBuyPrice: product.buyPrice,
       originalPrice: product.sellPrice,
       totalRefundedAmount: 0,
@@ -93,6 +94,14 @@ class CartController extends GetxController {
     if (newQty <= 0) {
       items.removeAt(index);
     } else {
+      if (delta > 0 && Get.isRegistered<ProductController>()) {
+        final products = Get.find<ProductController>().products;
+        final product = products.firstWhereOrNull(
+          (p) => p.id == item.productId,
+        );
+        if (product != null && newQty > product.stockQuantity) return;
+      }
+      final unitProfit = item.price - item.originalBuyPrice;
       items[index] = OrderProduct(
         id: item.id,
         orderId: item.orderId,
@@ -103,7 +112,7 @@ class CartController extends GetxController {
         discountPrice: item.discountPrice,
         discount: item.discount,
         quantity: newQty,
-        profit: item.profit,
+        profit: unitProfit * newQty,
         originalBuyPrice: item.originalBuyPrice,
         originalPrice: item.originalPrice,
         totalRefundedAmount: item.totalRefundedAmount,

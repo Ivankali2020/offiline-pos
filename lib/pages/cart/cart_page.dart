@@ -1,4 +1,5 @@
 import 'package:abpos/controllers/cart_controller.dart';
+import 'package:abpos/controllers/product_controller.dart';
 import 'package:abpos/routes/app_routes.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
@@ -122,10 +123,15 @@ class _CartPageState extends State<CartPage> {
                 children: controller.items.asMap().entries.map((entry) {
                   final index = entry.key;
                   final item = entry.value;
+                  final productController = Get.find<ProductController>();
+                  final product = productController.products.firstWhereOrNull(
+                    (p) => p.id == item.productId,
+                  );
                   return _CartItemCard(
                     itemName: item.productName ?? 'product_singular'.tr,
                     variantName: item.variantName,
                     quantity: item.quantity,
+                    maxQuantity: product?.stockQuantity,
                     unitPrice: item.price,
                     totalPrice: item.price * item.quantity,
                     currencyFormat: _currencyFormat,
@@ -379,6 +385,7 @@ class _CartItemCard extends StatelessWidget {
     required this.itemName,
     required this.variantName,
     required this.quantity,
+    this.maxQuantity,
     required this.unitPrice,
     required this.totalPrice,
     required this.currencyFormat,
@@ -390,6 +397,7 @@ class _CartItemCard extends StatelessWidget {
   final String itemName;
   final String? variantName;
   final int quantity;
+  final int? maxQuantity;
   final double unitPrice;
   final double totalPrice;
   final NumberFormat currencyFormat;
@@ -495,12 +503,16 @@ class _CartItemCard extends StatelessWidget {
                       IconButton(
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
-                        icon: const Icon(
+                        icon: Icon(
                           LucideIcons.plusCircle,
                           size: 18,
-                          color: Colors.blue,
+                          color: (maxQuantity != null && quantity >= maxQuantity!)
+                              ? Colors.grey
+                              : Colors.blue,
                         ),
-                        onPressed: onIncrease,
+                        onPressed: (maxQuantity != null && quantity >= maxQuantity!)
+                            ? null
+                            : onIncrease,
                       ),
                     ],
                   ),

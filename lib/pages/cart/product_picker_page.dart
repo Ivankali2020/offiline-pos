@@ -6,6 +6,7 @@ import 'package:abpos/controllers/cart_controller.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/barcode_scanner_button.dart';
+import 'package:abpos/widgets/masonry_grid_view.dart';
 import 'package:abpos/models/product.dart';
 
 class ProductPickerPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     final int crossAxisCount = screenWidth < 600
         ? 2
         : (screenWidth < 900 ? 3 : 4);
@@ -127,19 +128,17 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
                   ),
                 );
               }
-              return GridView.builder(
+              return MasonryGridView(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: screenWidth < 600 ? 1.2 : 1.38,
-                ),
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
                   return _PickerProductCard(
                     product: product,
+                    cartController: cartController,
                     onTap: () {
                       cartController.addProduct(product);
                     },
@@ -156,126 +155,144 @@ class _ProductPickerPageState extends State<ProductPickerPage> {
 
 class _PickerProductCard extends StatelessWidget {
   final Product product;
+  final CartController cartController;
   final VoidCallback onTap;
 
-  const _PickerProductCard({required this.product, required this.onTap});
+  const _PickerProductCard({
+    required this.product,
+    required this.cartController,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.10)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildStockBadge(context),
-              const SizedBox(height: 8),
-              Text(
-                product.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+    return Obx(() {
+      final cartQty = cartController.items
+          .where((item) => item.productId == product.id)
+          .fold<int>(0, (sum, item) => sum + item.quantity);
+      final remaining = product.stockQuantity - cartQty;
+      final outOfStock = remaining <= 0;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: outOfStock ? null : onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Ink(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${product.brandName ?? '-'} • ${product.categoryName ?? '-'}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
-              ),
-              const Spacer(),
-              if (!product.hasVariant)
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildStockBadge(context, remaining),
+                const SizedBox(height: 8),
                 Text(
-                  'MMK ${product.sellPrice.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    color: theme.primaryColor,
+                  product.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    'variants'.tr,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${product.brandName ?? '-'} • ${product.categoryName ?? '-'}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
+                ),
+                const SizedBox(height: 8),
+                if (!product.hasVariant)
+                  Text(
+                    'MMK ${product.sellPrice.toStringAsFixed(0)}',
                     style: TextStyle(
                       color: theme.primaryColor,
-                      fontSize: 9,
                       fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'variants'.tr,
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: outOfStock
+                          ? Colors.grey.shade300
+                          : theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          outOfStock
+                              ? Icons.remove_shopping_cart_rounded
+                              : LucideIcons.plusCircle,
+                          size: 15,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          outOfStock ? 'out_of_stock'.tr : 'add'.tr,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        LucideIcons.plusCircle,
-                        size: 15,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        'add'.tr,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  Widget _buildStockBadge(BuildContext context) {
-    final bool isLow = product.stockQuantity <= product.stockThreshold;
-    final Color color = isLow ? Colors.red : Colors.green;
+  Widget _buildStockBadge(BuildContext context, int remaining) {
+    final bool isOut = remaining <= 0;
+    final bool isLow = remaining > 0 && remaining <= product.stockThreshold;
+    final Color color = isOut ? Colors.red : (isLow ? Colors.orange : Colors.green);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -284,7 +301,9 @@ class _PickerProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'stock_qty'.tr.replaceAll('@qty', '${product.stockQuantity}'),
+        isOut
+            ? 'out_of_stock'.tr
+            : 'stock_qty'.tr.replaceAll('@qty', '$remaining'),
         style: TextStyle(
           color: color,
           fontSize: 9,

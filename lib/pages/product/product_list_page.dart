@@ -9,6 +9,7 @@ import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/custom_form_sheet.dart';
 import 'package:abpos/widgets/form/form_action_buttons.dart';
+import 'package:abpos/widgets/masonry_grid_view.dart';
 import 'package:abpos/models/product.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -38,6 +39,7 @@ class _ProductListPageState extends State<ProductListPage> {
     final int crossAxisCount = screenWidth < 600
         ? 2
         : (screenWidth < 900 ? 3 : 4);
+
 
     return AppScaffold(
       title: 'products'.tr,
@@ -144,14 +146,11 @@ class _ProductListPageState extends State<ProductListPage> {
               if (products.isEmpty) {
                 return Center(child: Text('no_products'.tr));
               }
-              return GridView.builder(
+              return MasonryGridView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: screenWidth < 600 ? 1.1 : 1.38,
-                ),
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -411,7 +410,7 @@ class _ProductCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
               ),
-              const Spacer(),
+              const SizedBox(height: 8),
               if (!product.hasVariant)
                 Text(
                   'MMK ${product.sellPrice.toStringAsFixed(0)}',

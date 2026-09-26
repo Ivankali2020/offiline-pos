@@ -4,6 +4,7 @@ import 'package:abpos/models/product.dart';
 import 'package:abpos/widgets/app_scaffold.dart';
 import 'package:abpos/widgets/custom_app_bar.dart';
 import 'package:abpos/widgets/form/barcode_scanner_button.dart';
+import 'package:abpos/widgets/masonry_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -126,14 +127,11 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
               if (products.isEmpty) {
                 return Center(child: Text('no_products_found'.tr));
               }
-              return GridView.builder(
+              return MasonryGridView(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: screenWidth < 600 ? 1.1 : 1.38,
-                ),
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -149,6 +147,7 @@ class _PurchaseProductPickerPageState extends State<PurchaseProductPickerPage> {
       ),
     );
   }
+
 
   void _showAddProductSheet(Product product) {
     final quantityController = TextEditingController(text: '1');
@@ -438,7 +437,7 @@ class _PickerCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
               ),
-              const Spacer(),
+              const SizedBox(height: 8),
               Text(
                 '${'buy'.tr} MMK ${product.buyPrice.toStringAsFixed(0)}',
                 style: const TextStyle(
