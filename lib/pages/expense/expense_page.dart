@@ -248,7 +248,7 @@ class _ExpensePageState extends State<ExpensePage> {
         builder: (context, setModalState) {
           return CustomFormSheet(
             title: 'filter'.tr,
-            subtitle: 'filter_expenses_subtitle'.tr,
+            subtitle: null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

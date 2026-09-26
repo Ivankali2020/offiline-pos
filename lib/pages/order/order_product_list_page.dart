@@ -372,20 +372,34 @@ class _OrderProductCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  'x${item.quantity}',
-                  style: const TextStyle(
-                    color: Color(0xFF10B981),
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'x${item.quantity}',
+                      style: const TextStyle(
+                        color: Color(0xFF10B981),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    currencyFormat.format(item.profit),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: const Color(0xFF10B981),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -405,7 +419,7 @@ class _OrderProductCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               _DetailChip(
-                label: 'profit'.tr,
+                label: 'unit_profit'.tr,
                 value: currencyFormat.format(unitProfit),
                 color: const Color(0xFF10B981),
               ),

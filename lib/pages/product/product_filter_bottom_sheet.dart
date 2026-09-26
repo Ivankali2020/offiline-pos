@@ -14,7 +14,7 @@ class ProductFilterBottomSheet extends StatefulWidget {
     return AppBottomSheet.show<void>(
       context,
       title: 'filter_products'.tr,
-      subtitle: 'filter_products_subtitle'.tr,
+      subtitle: null,
       trailing: TextButton(
         onPressed: () {
           controller.resetFilters();

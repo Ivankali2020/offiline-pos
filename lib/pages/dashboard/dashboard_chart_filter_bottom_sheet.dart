@@ -16,7 +16,7 @@ class DashboardChartFilterBottomSheet extends StatefulWidget {
     return AppBottomSheet.show<void>(
       context,
       title: 'filter_order_chart'.tr,
-      subtitle: 'filter_order_chart_subtitle'.tr,
+      subtitle: null,
       trailing: TextButton(
         onPressed: () async {
           await controller.clearChartFilter();

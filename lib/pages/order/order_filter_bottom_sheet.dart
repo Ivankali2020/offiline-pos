@@ -14,7 +14,7 @@ class OrderFilterBottomSheet extends StatefulWidget {
     return AppBottomSheet.show<void>(
       context,
       title: 'filter_orders'.tr,
-      subtitle: 'filter_orders_subtitle'.tr,
+      subtitle: null,
       trailing: TextButton(
         onPressed: () {
           controller.clearFilters();
